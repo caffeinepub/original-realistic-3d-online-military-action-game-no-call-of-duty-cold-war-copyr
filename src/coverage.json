@@ -1,0 +1,89 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-12T20:33:35.019Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-10",
+        "summary": "Expand the offline/single-player content with additional gameplay elements beyond the current initial slice, including (at minimum) a basic scoring or stats mechanic for hits and at least one additional weapon behavior or weapon option that the player can switch to during offline play.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/weapons/offlineWeapons.ts",
+          "frontend/src/game/weapons/useWeapon.ts",
+          "frontend/src/game/components/PlayerArmsAndWeapon.tsx",
+          "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+          "frontend/src/ui/HudOverlay.tsx",
+          "frontend/src/pages/OfflineSkirmishView.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/weapons/offlineWeapons.ts",
+          "frontend/src/game/weapons/useWeapon.ts",
+          "frontend/src/game/components/PlayerArmsAndWeapon.tsx",
+          "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+          "frontend/src/ui/HudOverlay.tsx",
+          "frontend/src/pages/OfflineSkirmishView.tsx"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Implement a true offline mode that is playable without Internet Identity authentication and without any backend/canister calls, ensuring offline gameplay screens do not trigger React Query polling or authenticated backend queries.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/ui/HudOverlay.tsx",
+          "frontend/src/pages/OfflineSkirmishView.tsx",
+          "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/ui/HudOverlay.tsx",
+          "frontend/src/pages/OfflineSkirmishView.tsx",
+          "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Add a dedicated offline gameplay option (separate from the current Training view) that provides an additional single-player experience (e.g., an 'Offline Skirmish' mode) using the existing FPS controls and weapon handling, with locally simulated opponents/targets and no backend dependency.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/HomeView.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/OfflineSkirmishView.tsx",
+          "frontend/src/game/scenes/OfflineSkirmishScene.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/HomeView.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/OfflineSkirmishView.tsx",
+          "frontend/src/game/scenes/OfflineSkirmishScene.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "build-template/README.md",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/game/components/PlayerArmsAndWeapon.tsx",
+    "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+    "frontend/src/game/weapons/offlineWeapons.ts",
+    "frontend/src/game/weapons/useWeapon.ts",
+    "frontend/src/pages/HomeView.tsx",
+    "frontend/src/pages/OfflineSkirmishView.tsx",
+    "frontend/src/ui/HudOverlay.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

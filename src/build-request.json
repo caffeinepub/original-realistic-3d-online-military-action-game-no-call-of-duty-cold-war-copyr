@@ -1,0 +1,80 @@
+{
+  "kind": "build_request",
+  "title": "Add true offline mode and expand single-player content",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-8",
+      "text": "Implement a true offline mode that is playable without Internet Identity authentication and without any backend/canister calls, ensuring offline gameplay screens do not trigger React Query polling or authenticated backend queries.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add more into the game plz and add offline mode too"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A user can start offline gameplay without signing in via Internet Identity.",
+        "When playing offline, the frontend does not call backend queries/mutations (no polling requests such as getPlayersInGame).",
+        "If the backend is unreachable (e.g., network down), offline mode still loads and remains playable without showing repeated error toasts or blocking UI.",
+        "Online mode behavior remains unchanged (still requires sign-in to access lobby/online match)."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Add a dedicated offline gameplay option (separate from the current Training view) that provides an additional single-player experience (e.g., an 'Offline Skirmish' mode) using the existing FPS controls and weapon handling, with locally simulated opponents/targets and no backend dependency.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add more into the game plz and add offline mode too"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Home menu includes a clearly labeled offline-only option (English text) that does not require sign-in.",
+        "Offline Skirmish runs entirely client-side using the existing Three.js/React Three Fiber pipeline and FPS controls.",
+        "Offline Skirmish shows at least one locally simulated non-player entity (e.g., moving target/dummy) in the scene.",
+        "ESC menu works in Offline Skirmish (resume + return to menu)."
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Expand the offline/single-player content with additional gameplay elements beyond the current initial slice, including (at minimum) a basic scoring or stats mechanic for hits and at least one additional weapon behavior or weapon option that the player can switch to during offline play.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add more into the game plz and add offline mode too"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Offline mode includes a visible, updating score/stats indicator in the HUD (English text), such as hit count, accuracy, or time-based score.",
+        "Player can switch between at least two weapon options/behaviors during offline play (e.g., different fire rate/spread/ammo), with clear input instructions available in the pause menu.",
+        "Offline gameplay content additions do not change or break the existing online multiplayer flow, lobby flow, or synchronization HUD in online mode.",
+        "All added content remains original and does not reference or copy any copyrighted Call of Duty/Cold War assets, names, or UI styling."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor (all logic in backend/main.mo); only add backend changes if strictly required for the offline request.",
+    "Do not edit files under frontend/src/components/ui (compose existing components instead).",
+    "Do not edit immutable hook files: frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
+    "Use English for all user-facing strings.",
+    "No WebSockets or real-time protocols; polling is allowed only for online mode."
+  ],
+  "nonGoals": [
+    "Adding third-party authentication providers (only Internet Identity is supported for online mode).",
+    "Adding external databases or non-Motoko backend services.",
+    "Implementing competitive ranked systems, complex AI, or large campaign content."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

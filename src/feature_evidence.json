@@ -1,0 +1,73 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-implement-a-true-offline-mode-that-is-playable-without-internet-identity-authentication-and-without-any-backend-canister-calls-ensuring-offline-gameplay-screens-do-not-trigger-react-query-polling-or-authenticated-backend-queries",
+      "featureTitle": "Implement a true offline mode that is playable without Internet Identity authentication and without any backend/canister calls, ensuring offline gameplay screens do not trigger React Query polling or authenticated backend queries.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+        "frontend/src/pages/OfflineSkirmishView.tsx",
+        "frontend/src/ui/HudOverlay.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-dedicated-offline-gameplay-option-separate-from-the-current-training-view-that-provides-an-additional-single-player-experience-e-g-an-offline-skirmish-mode-using-the-existing-fps-controls-and-weapon-handling-with-locally-simulated-opponents-targets-and-no-backend-dependency",
+      "featureTitle": "Add a dedicated offline gameplay option (separate from the current Training view) that provides an additional single-player experience (e.g., an 'Offline Skirmish' mode) using the existing FPS controls and weapon handling, with locally simulated opponents/targets and no backend dependency.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+        "frontend/src/pages/HomeView.tsx",
+        "frontend/src/pages/OfflineSkirmishView.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-expand-the-offline-single-player-content-with-additional-gameplay-elements-beyond-the-current-initial-slice-including-at-minimum-a-basic-scoring-or-stats-mechanic-for-hits-and-at-least-one-additional-weapon-behavior-or-weapon-option-that-the-player-can-switch-to-during-offline-play",
+      "featureTitle": "Expand the offline/single-player content with additional gameplay elements beyond the current initial slice, including (at minimum) a basic scoring or stats mechanic for hits and at least one additional weapon behavior or weapon option that the player can switch to during offline play.",
+      "files": [
+        "frontend/src/game/components/PlayerArmsAndWeapon.tsx",
+        "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
+        "frontend/src/game/weapons/offlineWeapons.ts",
+        "frontend/src/game/weapons/useWeapon.ts",
+        "frontend/src/pages/OfflineSkirmishView.tsx",
+        "frontend/src/ui/HudOverlay.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

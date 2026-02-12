@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "Project to create an original, realistic 3D online multiplayer military action game inspired by modern military shooters, explicitly avoiding any copyrighted Call of Duty content.",
+  "architectural_notes": [
+    "Must be original and not use copyrighted Call of Duty/Cold War characters, maps, assets, branding, or storyline."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-create-an-original-non-call-of-duty-realistic-3d-military-action-game-concept-and-implement-the-initial-playable-slice-a-single-small-training-map-first-person-camera-basic-wasd-movement-mouse-look-jump-crouch-sprint-and-simple-weapon-handling-aim-shoot-using-three-js-react-three-fiber",
+      "title": "Create an original (non-Call-of-Duty) realistic 3D military action game concept and implement the initial playable slice: a single small training map, first-person camera, basic WASD movement, mouse look, jump/crouch, sprint, and simple weapon handling (aim + shoot) using Three.js / React Three Fiber.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-online-multiplayer-mode-implemented-with-internet-computer-canister-state-client-polling-no-websockets-users-can-create-join-a-lobby-start-a-match-instance-and-see-at-least-two-players-represented-in-the-same-map-with-periodically-synchronized-positions-and-basic-actions",
+      "title": "Add an online multiplayer mode implemented with Internet Computer canister state + client polling (no WebSockets): users can create/join a lobby, start a match instance, and see at least two players represented in the same map with periodically synchronized positions and basic actions.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-internet-identity-sign-in-to-associate-online-players-with-principals-and-display-a-simple-player-identity-label-in-lobbies-and-in-game-e-g-shortened-principal-or-user-chosen-nickname-stored-on-the-canister",
+      "title": "Add Internet Identity sign-in to associate online players with principals and display a simple player identity label in lobbies and in-game (e.g., shortened principal or user-chosen nickname stored on the canister).",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-game-assets-are-original-and-do-not-use-any-copyrighted-call-of-duty-black-ops-cold-war-content-names-logos-characters-maps-sounds-ui-styling-or-copied-likeness-add-an-explicit-in-app-disclaimer-that-the-game-is-an-original-project-and-is-not-affiliated-with-call-of-duty",
+      "title": "Ensure all game assets are original and do not use any copyrighted Call of Duty / Black Ops Cold War content (names, logos, characters, maps, sounds, UI styling, or copied likeness). Add an explicit in-app disclaimer that the game is an original project and is not affiliated with Call of Duty.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-visual-theme-for-the-app-ui-menus-lobby-screens-hud-with-a-distinct-realistic-military-inspired-style-without-mimicking-any-specific-franchise-consistent-typography-spacing-button-styles-and-a-restrained-color-palette-avoid-blue-purple",
+      "title": "Create a coherent visual theme for the app UI (menus, lobby screens, HUD) with a distinct realistic/military-inspired style (without mimicking any specific franchise): consistent typography, spacing, button styles, and a restrained color palette (avoid blue/purple).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-basic-game-menus-and-hud-home-play-online-training-lobby-create-join-start-leave-in-game-hud-health-placeholder-ammo-placeholder-mini-status-and-a-simple-latency-last-sync-indicator-based-on-polling",
+      "title": "Add basic game menus and HUD: Home (Play Online / Training), Lobby (create/join/start/leave), In-game HUD (health placeholder, ammo placeholder, mini status, and a simple latency/last-sync indicator based on polling).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-true-offline-mode-that-is-playable-without-internet-identity-authentication-and-without-any-backend-canister-calls-ensuring-offline-gameplay-screens-do-not-trigger-react-query-polling-or-authenticated-backend-queries",
+      "title": "Implement a true offline mode that is playable without Internet Identity authentication and without any backend/canister calls, ensuring offline gameplay screens do not trigger React Query polling or authenticated backend queries.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-offline-gameplay-option-separate-from-the-current-training-view-that-provides-an-additional-single-player-experience-e-g-an-offline-skirmish-mode-using-the-existing-fps-controls-and-weapon-handling-with-locally-simulated-opponents-targets-and-no-backend-dependency",
+      "title": "Add a dedicated offline gameplay option (separate from the current Training view) that provides an additional single-player experience (e.g., an 'Offline Skirmish' mode) using the existing FPS controls and weapon handling, with locally simulated opponents/targets and no backend dependency.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expand-the-offline-single-player-content-with-additional-gameplay-elements-beyond-the-current-initial-slice-including-at-minimum-a-basic-scoring-or-stats-mechanic-for-hits-and-at-least-one-additional-weapon-behavior-or-weapon-option-that-the-player-can-switch-to-during-offline-play",
+      "title": "Expand the offline/single-player content with additional gameplay elements beyond the current initial slice, including (at minimum) a basic scoring or stats mechanic for hits and at least one additional weapon behavior or weapon option that the player can switch to during offline play.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Design and build an original, highly realistic 3D online multiplayer military action game (no copyrighted Call of Duty/Cold War content).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Add online multiplayer functionality (networked play).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Implement backend game state management in a single Motoko actor: lobby registry, match registry, player presence, and an authoritative snapshot structure for players (position/rotation, timestamps) and lightweight actions (e.g., fired shots count or last-shot timestamp).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add an offline mode so the game can be played without online multiplayer connectivity (e.g., local training/sandbox).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Expand the game with additional content/features beyond the current initial slice (more gameplay elements, maps, weapons, or modes—TBD).",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "3d",
+  "projectName": "Original realistic 3D online military action game (no Call of Duty/Cold War copyrighted content)",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
