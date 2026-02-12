@@ -92,6 +92,7 @@ export class ExternalBlob {
 export type PlayerId = Principal;
 export interface LobbyState {
     id: bigint;
+    selectedMap: GameMap;
     owner: PlayerId;
     players: Array<PlayerId>;
 }
@@ -109,6 +110,13 @@ export interface PlayerState {
     position: Position;
     health: bigint;
 }
+export interface MatchState {
+    id: bigint;
+    map: GameMap;
+    startTime: Time;
+    isActive: boolean;
+    players: Array<PlayerId>;
+}
 export interface GameState {
     id: bigint;
     isGameStarted: boolean;
@@ -119,6 +127,12 @@ export interface UserProfile {
     username: string;
     gamesPlayed: bigint;
     wins: bigint;
+}
+export enum GameMap {
+    jungle = "jungle",
+    city = "city",
+    desert = "desert",
+    island = "island"
 }
 export enum UserRole {
     admin = "admin",
@@ -138,10 +152,11 @@ export interface backendInterface {
     joinLobby(): Promise<LobbyState>;
     leaveLobby(lobbyId: bigint): Promise<LobbyState>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    startGame(players: Array<PlayerId>): Promise<GameState>;
+    selectMap(lobbyId: bigint, map: GameMap): Promise<void>;
+    startGame(lobbyId: bigint): Promise<MatchState>;
     updatePlayerPosition(position: Position): Promise<Array<PlayerState>>;
 }
-import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { GameMap as _GameMap, LobbyState as _LobbyState, MatchState as _MatchState, PlayerId as _PlayerId, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -190,42 +205,42 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getActiveLobbies();
-                return result;
+                return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getActiveLobbies();
-            return result;
+            return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserProfile(): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
-                return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserProfile();
-            return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n9(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n9(this._uploadFile, this._downloadFile, result);
         }
     }
     async getPlayersInGame(): Promise<Array<PlayerState>> {
@@ -246,14 +261,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
-                return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUserProfile(arg0);
-            return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -274,28 +289,28 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.joinLobby();
-                return result;
+                return from_candid_LobbyState_n4(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.joinLobby();
-            return result;
+            return from_candid_LobbyState_n4(this._uploadFile, this._downloadFile, result);
         }
     }
     async leaveLobby(arg0: bigint): Promise<LobbyState> {
         if (this.processError) {
             try {
                 const result = await this.actor.leaveLobby(arg0);
-                return result;
+                return from_candid_LobbyState_n4(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.leaveLobby(arg0);
-            return result;
+            return from_candid_LobbyState_n4(this._uploadFile, this._downloadFile, result);
         }
     }
     async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
@@ -312,18 +327,32 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async startGame(arg0: Array<PlayerId>): Promise<GameState> {
+    async selectMap(arg0: bigint, arg1: GameMap): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.startGame(arg0);
+                const result = await this.actor.selectMap(arg0, to_candid_GameMap_n11(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.startGame(arg0);
+            const result = await this.actor.selectMap(arg0, to_candid_GameMap_n11(this._uploadFile, this._downloadFile, arg1));
             return result;
+        }
+    }
+    async startGame(arg0: bigint): Promise<MatchState> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.startGame(arg0);
+                return from_candid_MatchState_n13(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.startGame(arg0);
+            return from_candid_MatchState_n13(this._uploadFile, this._downloadFile, result);
         }
     }
     async updatePlayerPosition(arg0: Position): Promise<Array<PlayerState>> {
@@ -341,13 +370,61 @@ export class Backend implements backendInterface {
         }
     }
 }
-function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n5(_uploadFile, _downloadFile, value);
+function from_candid_GameMap_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _GameMap): GameMap {
+    return from_candid_variant_n7(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+function from_candid_LobbyState_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _LobbyState): LobbyState {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
+}
+function from_candid_MatchState_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _MatchState): MatchState {
+    return from_candid_record_n14(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n10(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    map: _GameMap;
+    startTime: _Time;
+    isActive: boolean;
+    players: Array<_PlayerId>;
+}): {
+    id: bigint;
+    map: GameMap;
+    startTime: Time;
+    isActive: boolean;
+    players: Array<PlayerId>;
+} {
+    return {
+        id: value.id,
+        map: from_candid_GameMap_n6(_uploadFile, _downloadFile, value.map),
+        startTime: value.startTime,
+        isActive: value.isActive,
+        players: value.players
+    };
+}
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    selectedMap: _GameMap;
+    owner: _PlayerId;
+    players: Array<_PlayerId>;
+}): {
+    id: bigint;
+    selectedMap: GameMap;
+    owner: PlayerId;
+    players: Array<PlayerId>;
+} {
+    return {
+        id: value.id,
+        selectedMap: from_candid_GameMap_n6(_uploadFile, _downloadFile, value.selectedMap),
+        owner: value.owner,
+        players: value.players
+    };
+}
+function from_candid_variant_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -356,8 +433,44 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
+function from_candid_variant_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    jungle: null;
+} | {
+    city: null;
+} | {
+    desert: null;
+} | {
+    island: null;
+}): GameMap {
+    return "jungle" in value ? GameMap.jungle : "city" in value ? GameMap.city : "desert" in value ? GameMap.desert : "island" in value ? GameMap.island : value;
+}
+function from_candid_vec_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_LobbyState>): Array<LobbyState> {
+    return value.map((x)=>from_candid_LobbyState_n4(_uploadFile, _downloadFile, x));
+}
+function to_candid_GameMap_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: GameMap): _GameMap {
+    return to_candid_variant_n12(_uploadFile, _downloadFile, value);
+}
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_variant_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: GameMap): {
+    jungle: null;
+} | {
+    city: null;
+} | {
+    desert: null;
+} | {
+    island: null;
+} {
+    return value == GameMap.jungle ? {
+        jungle: null
+    } : value == GameMap.city ? {
+        city: null
+    } : value == GameMap.desert ? {
+        desert: null
+    } : value == GameMap.island ? {
+        island: null
+    } : value;
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;

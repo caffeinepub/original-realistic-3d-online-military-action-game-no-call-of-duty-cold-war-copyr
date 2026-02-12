@@ -1,12 +1,14 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
+  "projectStateVersion": 17,
   "summary": "Project to create an original, realistic 3D online multiplayer military action game inspired by modern military shooters, explicitly avoiding any copyrighted Call of Duty content.",
   "architectural_notes": [
-    "Must be original and not use copyrighted Call of Duty/Cold War characters, maps, assets, branding, or storyline."
+    "Must be original and not use copyrighted Call of Duty/Cold War characters, maps, assets, branding, or storyline.",
+    "Any new maps must be original and must not recreate or closely imitate recognizable Call of Duty map layouts, landmarks, names, or signature set pieces."
   ],
   "known_issues": [
-    "Creating a new lobby fails with an error message ('failed')."
+    "Creating a new lobby fails with an error message ('failed').",
+    "Game performance is slow (low FPS / laggy runtime)."
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -97,6 +99,110 @@
         "REQ-14"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-user-selectable-graphics-performance-setting-that-reduces-gpu-load-in-all-gameplay-scenes-training-offline-skirmish-online-match-by-defaulting-to-a-balanced-mode-and-allowing-a-lower-quality-mode-for-slower-devices",
+      "title": "Add a user-selectable graphics/performance setting that reduces GPU load in all gameplay scenes (Training, Offline Skirmish, Online Match) by defaulting to a balanced mode and allowing a lower-quality mode for slower devices.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-optimize-visual-effects-that-currently-trigger-per-frame-react-state-updates-e-g-bullet-impact-effects-and-weapon-recoil-to-avoid-unnecessary-react-re-renders-during-gameplay",
+      "title": "Optimize visual effects that currently trigger per-frame React state updates (e.g., bullet impact effects and weapon recoil) to avoid unnecessary React re-renders during gameplay.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-reduce-rendering-overhead-from-online-multiplayer-avatars-and-labels-by-minimizing-expensive-dom-overlays-and-unnecessary-per-frame-work-when-many-remote-players-are-present",
+      "title": "Reduce rendering overhead from online multiplayer avatars and labels by minimizing expensive DOM overlays and unnecessary per-frame work when many remote players are present.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-reduce-unnecessary-network-and-render-churn-in-online-match-by-ensuring-position-updates-are-throttled-and-or-suppressed-when-movement-rotation-changes-are-below-a-small-threshold",
+      "title": "Reduce unnecessary network and render churn in Online Match by ensuring position updates are throttled and/or suppressed when movement/rotation changes are below a small threshold.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-lightweight-in-game-performance-debug-readout-toggleable-showing-fps-and-current-graphics-mode-to-help-confirm-improvements-and-troubleshoot-slow-devices",
+      "title": "Add a lightweight in-game performance/debug readout (toggleable) showing FPS and current graphics mode to help confirm improvements and troubleshoot slow devices.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-authenticated-host-only-action-to-select-the-map-for-a-lobby-before-starting-the-game-and-ensure-this-selection-is-persisted-and-used-when-the-host-starts-the-match",
+      "title": "Add an authenticated host-only action to select the map for a lobby before starting the game, and ensure this selection is persisted and used when the host starts the match.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-at-least-one-new-fully-original-3d-map-geometry-layout-landmarks-with-a-modern-military-training-feel-inspired-by-popular-arena-layouts-but-not-copying-any-call-of-duty-map-and-make-it-available-as-a-selectable-map-option",
+      "title": "Create at least one new fully original 3D map (geometry/layout/landmarks) with a modern-military training feel, inspired by popular arena layouts but not copying any Call of Duty map, and make it available as a selectable map option.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-user-facing-text-related-to-map-selection-and-map-names-is-in-english-and-includes-an-explicit-non-infringement-stance-in-naming-original-map-names-no-call-of-duty-map-names-or-close-variants",
+      "title": "Ensure all user-facing text related to map selection and map names is in English and includes an explicit non-infringement stance in naming (original map names; no Call of Duty map names or close variants).",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-additional-original-hideouts-and-house-building-style-cover-to-every-existing-gameplay-map-so-that-each-map-feels-more-filled-in-and-offers-more-places-to-take-cover-without-blocking-basic-navigation-paths-update-these-map-components-frontend-src-game-maps-trainingrangemap-tsx-frontend-src-game-maps-harboryardmap-tsx-frontend-src-game-maps-desertoutpostmap-tsx-frontend-src-game-maps-junglecompoundmap-tsx",
+      "title": "Add additional original hideouts and house/building-style cover to every existing gameplay map so that each map feels more filled-in and offers more places to take cover (without blocking basic navigation paths). Update these map components: frontend/src/game/maps/TrainingRangeMap.tsx, frontend/src/game/maps/HarborYardMap.tsx, frontend/src/game/maps/DesertOutpostMap.tsx, frontend/src/game/maps/JungleCompoundMap.tsx.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-grass-like-ground-detail-to-each-gameplay-map-to-improve-realism-while-keeping-performance-acceptable-and-consistent-with-the-current-graphics-settings-balanced-vs-performance-update-these-map-components-frontend-src-game-maps-trainingrangemap-tsx-frontend-src-game-maps-harboryardmap-tsx-frontend-src-game-maps-desertoutpostmap-tsx-frontend-src-game-maps-junglecompoundmap-tsx",
+      "title": "Add grass-like ground detail to each gameplay map to improve realism while keeping performance acceptable and consistent with the current graphics settings (Balanced vs Performance). Update these map components: frontend/src/game/maps/TrainingRangeMap.tsx, frontend/src/game/maps/HarborYardMap.tsx, frontend/src/game/maps/DesertOutpostMap.tsx, frontend/src/game/maps/JungleCompoundMap.tsx.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-trees-placed-on-the-ground-in-maps-that-do-not-already-feature-them-using-original-low-poly-procedural-geometry-and-respecting-graphics-settings-ensure-trees-are-placed-around-the-edges-and-non-critical-areas-so-they-improve-realism-without-harming-navigation-update-at-minimum-frontend-src-game-maps-trainingrangemap-tsx-frontend-src-game-maps-harboryardmap-tsx-frontend-src-game-maps-desertoutpostmap-tsx-junglecompoundmap-tsx-already-contains-trees-only-adjust-if-needed-for-consistency-performance",
+      "title": "Add trees placed on the ground in maps that do not already feature them, using original low-poly/procedural geometry and respecting graphics settings. Ensure trees are placed around the edges and non-critical areas so they improve realism without harming navigation. Update at minimum: frontend/src/game/maps/TrainingRangeMap.tsx, frontend/src/game/maps/HarborYardMap.tsx, frontend/src/game/maps/DesertOutpostMap.tsx (JungleCompoundMap.tsx already contains trees; only adjust if needed for consistency/performance).",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-visible-doors-to-house-building-structures-across-maps-visual-only-no-interaction-required-using-original-geometry-materials-consistent-with-each-map-s-building-style-update-these-map-components-frontend-src-game-maps-trainingrangemap-tsx-sheds-frontend-src-game-maps-harboryardmap-tsx-warehouse-sheds-frontend-src-game-maps-desertoutpostmap-tsx-central-building-huts-where-appropriate-frontend-src-game-maps-junglecompoundmap-tsx-wooden-huts",
+      "title": "Add visible doors to house/building structures across maps (visual-only; no interaction required) using original geometry/materials consistent with each map’s building style. Update these map components: frontend/src/game/maps/TrainingRangeMap.tsx (sheds), frontend/src/game/maps/HarborYardMap.tsx (warehouse + sheds), frontend/src/game/maps/DesertOutpostMap.tsx (central building + huts where appropriate), frontend/src/game/maps/JungleCompoundMap.tsx (wooden huts).",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-lobby-ui-surfaces-the-real-backend-error-reason-when-lobby-creation-fails-instead-of-a-generic-message-like-failed-using-english-user-facing-text",
+      "title": "Ensure the Lobby UI surfaces the real backend error reason when lobby creation fails (instead of a generic message like \"failed\"), using English user-facing text.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -145,6 +251,48 @@
       "summary": "Fix backend authorization so an authenticated Internet Identity user can save a user profile via saveCallerUserProfile without requiring pre-existing #user permissions (avoid a permissions deadlock for first-time users). Anonymous principal must still be blocked.",
       "reqIds": [
         "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add additional multiplayer maps with a modern-military feel inspired by (but not copying) popular shooter layouts; ensure all geometry, landmarks, and naming are fully original and non-infringing.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Add support for multiple gameplay maps by introducing a stable, explicit map identifier (e.g., a Text/enum-like value) and ensuring the backend can store and return the selected map for an online match.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add more hideouts and additional house/building cover to fill out the maps (increase environment density and cover locations).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Improve map environment realism by adding ground grass, placeable trees, and functional/visual doors on houses/buildings (original assets only).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Fix backend authorization so an authenticated Internet Identity user can successfully create a new lobby via the joinLobby method, while the anonymous principal remains blocked.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Remove or revise backend permission checks that currently rely on #user permissions in a way that can deadlock normal gameplay (e.g., leaveLobby, updatePlayerPosition, getPlayersInGame, startGame, endGame), so that authenticated users can perform expected multiplayer actions without needing manual permission assignment, while anonymous callers remain blocked.",
+      "reqIds": [
+        "REQ-29"
       ],
       "status": "pending"
     }

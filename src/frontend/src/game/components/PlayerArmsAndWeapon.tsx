@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useWeapon from '../weapons/useWeapon';
@@ -13,13 +13,13 @@ interface PlayerArmsAndWeaponProps {
 export default function PlayerArmsAndWeapon({ cameraRef, onFire, weaponConfig }: PlayerArmsAndWeaponProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { isFiring, fire } = useWeapon({ onFire, cameraRef, weaponConfig });
-  const [recoil, setRecoil] = useState(0);
+  const recoilRef = useRef(0);
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button === 0 && document.pointerLockElement) {
         fire();
-        setRecoil(0.1);
+        recoilRef.current = 0.1;
       }
     };
 
@@ -30,9 +30,9 @@ export default function PlayerArmsAndWeapon({ cameraRef, onFire, weaponConfig }:
   useFrame(({ camera }) => {
     if (!groupRef.current) return;
 
-    // Smooth recoil recovery
-    if (recoil > 0) {
-      setRecoil(prev => Math.max(0, prev - 0.01));
+    // Smooth recoil recovery using ref instead of state
+    if (recoilRef.current > 0) {
+      recoilRef.current = Math.max(0, recoilRef.current - 0.01);
     }
 
     // Position weapon relative to camera
@@ -45,7 +45,7 @@ export default function PlayerArmsAndWeapon({ cameraRef, onFire, weaponConfig }:
     groupRef.current.position.add(offset);
 
     // Apply recoil
-    groupRef.current.rotation.x += recoil;
+    groupRef.current.rotation.x += recoilRef.current;
   });
 
   // Adjust weapon visuals based on config

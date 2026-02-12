@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix lobby creation failures for authenticated Internet Identity users by correcting backend authorization and improving Lobby screen gating/error messaging.
+**Goal:** Fix backend authorization so authenticated Internet Identity users can create and manage multiplayer lobbies reliably, while anonymous callers remain blocked, and improve lobby UI error messaging.
 
 **Planned changes:**
-- Backend: adjust authorization so authenticated principals can create a lobby via `joinLobby`, while the anonymous principal remains blocked with a clear unauthorized error.
-- Backend: allow first-time authenticated users to save a profile via `saveCallerUserProfile` without requiring pre-existing `#user` permissions; keep anonymous blocked and preserve existing profile loading via `getCallerUserProfile`.
-- Frontend: improve Lobby “Create New Lobby” failure messaging to show a user-friendly, more specific reason when available (including backend error text when present).
-- Frontend: prevent unauthenticated users from attempting lobby creation by disabling/gating “Create New Lobby” when not signed in and prompting sign-in; enable the action immediately after sign-in without reload.
+- Adjust backend authorization in `joinLobby` so authenticated Internet Identity callers can create/persist lobbies and see them in `getActiveLobbies`, while anonymous callers trap with an Unauthorized error.
+- Remove or revise backend permission checks that depend on `#user` permissions in a way that blocks normal authenticated gameplay (e.g., `leaveLobby`, `updatePlayerPosition`, `getPlayersInGame`, `startGame`, `endGame`), while continuing to reject anonymous callers for multiplayer state-changing actions.
+- Update the Lobby UI to display specific, English error messages that reflect the actual backend failure reason during lobby creation, while keeping raw error logging in the console and maintaining existing auth gating.
 
-**User-visible outcome:** Signed-in users can create lobbies successfully and see clearer error messages when something goes wrong; signed-out users are prompted to sign in and cannot attempt lobby creation.
+**User-visible outcome:** Signed-in users can create and play in multiplayer lobbies without unexpected Unauthorized errors, and if lobby creation fails, they see a clear English reason instead of a generic failure message.

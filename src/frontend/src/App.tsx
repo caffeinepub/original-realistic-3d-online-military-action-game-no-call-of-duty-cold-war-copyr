@@ -6,6 +6,8 @@ import LobbyView from './pages/LobbyView';
 import OnlineGameView from './pages/OnlineGameView';
 import OfflineSkirmishView from './pages/OfflineSkirmishView';
 import { Toaster } from '@/components/ui/sonner';
+import { GraphicsSettingsProvider } from './game/settings/GraphicsSettingsContext';
+import { DebugSettingsProvider } from './game/settings/DebugSettingsContext';
 
 export type AppView = 'home' | 'training' | 'lobby' | 'online-game' | 'offline-skirmish';
 
@@ -22,18 +24,22 @@ function App() {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <div className="min-h-screen bg-background">
-        {currentView === 'home' && <HomeView onNavigate={navigateTo} />}
-        {currentView === 'training' && <TrainingView onNavigate={navigateTo} />}
-        {currentView === 'lobby' && <LobbyView onNavigate={navigateTo} />}
-        {currentView === 'online-game' && (
-          <OnlineGameView onNavigate={navigateTo} lobbyId={currentLobbyId} />
-        )}
-        {currentView === 'offline-skirmish' && (
-          <OfflineSkirmishView onNavigate={navigateTo} />
-        )}
-        <Toaster />
-      </div>
+      <GraphicsSettingsProvider>
+        <DebugSettingsProvider>
+          <div className="min-h-screen bg-background">
+            {currentView === 'home' && <HomeView onNavigate={navigateTo} />}
+            {currentView === 'training' && <TrainingView onNavigate={navigateTo} />}
+            {currentView === 'lobby' && <LobbyView onNavigate={navigateTo} />}
+            {currentView === 'online-game' && (
+              <OnlineGameView onNavigate={navigateTo} lobbyId={currentLobbyId} />
+            )}
+            {currentView === 'offline-skirmish' && (
+              <OfflineSkirmishView onNavigate={navigateTo} />
+            )}
+            <Toaster />
+          </div>
+        </DebugSettingsProvider>
+      </GraphicsSettingsProvider>
     </ThemeProvider>
   );
 }

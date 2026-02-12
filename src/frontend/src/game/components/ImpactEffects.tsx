@@ -1,4 +1,4 @@
-import { useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useRef, forwardRef, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -9,8 +9,9 @@ interface Impact {
 }
 
 const ImpactEffects = forwardRef<{ addImpact: (point: THREE.Vector3) => void }>((_, ref) => {
-  const [impacts, setImpacts] = useState<Impact[]>([]);
+  const impactsRef = useRef<Impact[]>([]);
   const nextId = useRef(0);
+  const lastCleanup = useRef(0);
 
   useImperativeHandle(ref, () => ({
     addImpact: (point: THREE.Vector3) => {
@@ -19,18 +20,23 @@ const ImpactEffects = forwardRef<{ addImpact: (point: THREE.Vector3) => void }>(
         position: point.clone(),
         createdAt: Date.now(),
       };
-      setImpacts(prev => [...prev, impact]);
+      impactsRef.current.push(impact);
     },
   }));
 
-  useFrame(() => {
-    const now = Date.now();
-    setImpacts(prev => prev.filter(impact => now - impact.createdAt < 500));
+  useFrame(({ clock }) => {
+    // Only cleanup every 100ms instead of every frame
+    const now = clock.getElapsedTime();
+    if (now - lastCleanup.current > 0.1) {
+      lastCleanup.current = now;
+      const currentTime = Date.now();
+      impactsRef.current = impactsRef.current.filter(impact => currentTime - impact.createdAt < 500);
+    }
   });
 
   return (
     <>
-      {impacts.map(impact => (
+      {impactsRef.current.map(impact => (
         <group key={impact.id} position={impact.position}>
           <pointLight intensity={0.5} distance={2} color="#ff6600" />
           <mesh>

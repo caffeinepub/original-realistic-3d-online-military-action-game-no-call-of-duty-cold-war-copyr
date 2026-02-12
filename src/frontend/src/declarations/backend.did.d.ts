@@ -10,6 +10,10 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export type GameMap = { 'jungle' : null } |
+  { 'city' : null } |
+  { 'desert' : null } |
+  { 'island' : null };
 export interface GameState {
   'id' : bigint,
   'isGameStarted' : boolean,
@@ -18,7 +22,15 @@ export interface GameState {
 }
 export interface LobbyState {
   'id' : bigint,
+  'selectedMap' : GameMap,
   'owner' : PlayerId,
+  'players' : Array<PlayerId>,
+}
+export interface MatchState {
+  'id' : bigint,
+  'map' : GameMap,
+  'startTime' : Time,
+  'isActive' : boolean,
   'players' : Array<PlayerId>,
 }
 export type PlayerId = Principal;
@@ -57,7 +69,8 @@ export interface _SERVICE {
   'joinLobby' : ActorMethod<[], LobbyState>,
   'leaveLobby' : ActorMethod<[bigint], LobbyState>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'startGame' : ActorMethod<[Array<PlayerId>], GameState>,
+  'selectMap' : ActorMethod<[bigint, GameMap], undefined>,
+  'startGame' : ActorMethod<[bigint], MatchState>,
   'updatePlayerPosition' : ActorMethod<[Position], Array<PlayerState>>,
 }
 export declare const idlService: IDL.ServiceClass;

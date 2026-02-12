@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { UserProfile, Position, PlayerState, LobbyState } from '../backend';
+import type { UserProfile, Position, PlayerState, LobbyState, PlayerId, GameMap } from '../backend';
 import { Principal } from '@dfinity/principal';
 
 export function useGetCallerUserProfile() {
@@ -48,6 +48,7 @@ export function useUpdatePlayerPosition() {
       return actor.updatePlayerPosition(position);
     },
     onSuccess: (data) => {
+      // Use setQueryData to avoid unnecessary re-renders
       queryClient.setQueryData(['playersInGame'], data);
     },
   });
@@ -111,13 +112,32 @@ export function useLeaveLobby() {
   });
 }
 
-export function useStartGame() {
+export function useSelectMap() {
   const { actor } = useActor();
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (players: Principal[]) => {
+    mutationFn: async ({ lobbyId, map }: { lobbyId: bigint; map: GameMap }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.startGame(players);
+      return actor.selectMap(lobbyId, map);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activeLobbies'] });
+    },
+  });
+}
+
+export function useStartGame() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (lobbyId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.startGame(lobbyId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['playersInGame'] });
     },
   });
 }

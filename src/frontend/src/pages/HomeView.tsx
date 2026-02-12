@@ -3,7 +3,9 @@ import LoginButton from '../ui/LoginButton';
 import ProfileSetupDialog from '../ui/ProfileSetupDialog';
 import DisclaimerFooter from '../ui/DisclaimerFooter';
 import type { AppView } from '../App';
-import { Target, Users, Swords } from 'lucide-react';
+import { Target, Users, Swords, Settings } from 'lucide-react';
+import { useGraphicsSettings } from '../game/settings/useGraphicsSettings';
+import type { GraphicsMode } from '../game/settings/graphics';
 
 interface HomeViewProps {
   onNavigate: (view: AppView) => void;
@@ -11,6 +13,7 @@ interface HomeViewProps {
 
 export default function HomeView({ onNavigate }: HomeViewProps) {
   const { identity } = useInternetIdentity();
+  const { graphicsMode, setGraphicsMode } = useGraphicsSettings();
   const isAuthenticated = !!identity;
 
   return (
@@ -38,7 +41,21 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
             <p className="text-sm text-gray-300">Original Military Action</p>
           </div>
         </div>
-        <LoginButton />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border border-border rounded-lg px-4 py-2">
+            <Settings className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Graphics:</span>
+            <select
+              value={graphicsMode}
+              onChange={(e) => setGraphicsMode(e.target.value as GraphicsMode)}
+              className="bg-transparent text-white text-sm font-medium border-none outline-none cursor-pointer"
+            >
+              <option value="Balanced">Balanced</option>
+              <option value="Performance">Performance</option>
+            </select>
+          </div>
+          <LoginButton />
+        </div>
       </header>
 
       {/* Main Content */}

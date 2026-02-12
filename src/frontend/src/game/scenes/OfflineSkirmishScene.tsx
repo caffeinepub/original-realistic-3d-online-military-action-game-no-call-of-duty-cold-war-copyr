@@ -6,6 +6,8 @@ import PlayerArmsAndWeapon from '../components/PlayerArmsAndWeapon';
 import ImpactEffects from '../components/ImpactEffects';
 import type { WeaponConfig } from '../weapons/offlineWeapons';
 import { OFFLINE_WEAPONS } from '../weapons/offlineWeapons';
+import { useGraphicsSettings } from '../settings/useGraphicsSettings';
+import { getGraphicsSettings } from '../settings/graphics';
 
 interface OfflineSkirmishSceneProps {
   onHit: () => void;
@@ -24,6 +26,8 @@ interface MovingTarget {
 export default function OfflineSkirmishScene({ onHit, onMiss, currentWeapon }: OfflineSkirmishSceneProps) {
   const { position, rotation, cameraRef } = useFpsControls();
   const impactRef = useRef<{ addImpact: (point: THREE.Vector3) => void }>(null);
+  const { graphicsMode } = useGraphicsSettings();
+  const settings = getGraphicsSettings(graphicsMode);
   
   const [targets] = useState<MovingTarget[]>([
     {
@@ -123,8 +127,8 @@ export default function OfflineSkirmishScene({ onHit, onMiss, currentWeapon }: O
       <directionalLight
         position={[10, 20, 10]}
         intensity={1.5}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
+        castShadow={settings.shadowsEnabled}
+        shadow-mapSize={[settings.shadowMapSize, settings.shadowMapSize]}
         shadow-camera-left={-20}
         shadow-camera-right={20}
         shadow-camera-top={20}
@@ -133,7 +137,7 @@ export default function OfflineSkirmishScene({ onHit, onMiss, currentWeapon }: O
       <hemisphereLight args={['#87ceeb', '#545454', 0.5]} />
 
       {/* Ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={settings.shadowsEnabled} position={[0, 0, 0]}>
         <planeGeometry args={[100, 100]} />
         <meshStandardMaterial 
           color="#3a3a3a" 
@@ -144,11 +148,11 @@ export default function OfflineSkirmishScene({ onHit, onMiss, currentWeapon }: O
 
       {/* Training structures */}
       {/* Walls */}
-      <mesh position={[-10, 1.5, 0]} castShadow receiveShadow>
+      <mesh position={[-10, 1.5, 0]} castShadow={settings.shadowsEnabled} receiveShadow={settings.shadowsEnabled}>
         <boxGeometry args={[0.5, 3, 20]} />
         <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
       </mesh>
-      <mesh position={[10, 1.5, 0]} castShadow receiveShadow>
+      <mesh position={[10, 1.5, 0]} castShadow={settings.shadowsEnabled} receiveShadow={settings.shadowsEnabled}>
         <boxGeometry args={[0.5, 3, 20]} />
         <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
       </mesh>
@@ -161,7 +165,7 @@ export default function OfflineSkirmishScene({ onHit, onMiss, currentWeapon }: O
         [5, 0.75, -12],
         [-5, 0.75, -12],
       ].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} castShadow receiveShadow>
+        <mesh key={i} position={pos as [number, number, number]} castShadow={settings.shadowsEnabled} receiveShadow={settings.shadowsEnabled}>
           <boxGeometry args={[1.5, pos[1] * 2, 1.5]} />
           <meshStandardMaterial 
             color="#5a5a5a" 
@@ -179,12 +183,12 @@ export default function OfflineSkirmishScene({ onHit, onMiss, currentWeapon }: O
               if (ref) targets[i].mesh = ref;
             }}
             position={target.position}
-            castShadow
+            castShadow={settings.shadowsEnabled}
           >
             <cylinderGeometry args={[0.3, 0.3, 2, 8]} />
             <meshStandardMaterial color="#c41e3a" roughness={0.9} />
           </mesh>
-          <mesh position={[target.position.x, target.position.y + 1.2, target.position.z]} castShadow>
+          <mesh position={[target.position.x, target.position.y + 1.2, target.position.z]} castShadow={settings.shadowsEnabled}>
             <sphereGeometry args={[0.4, 16, 16]} />
             <meshStandardMaterial color="#ff4444" roughness={0.8} />
           </mesh>

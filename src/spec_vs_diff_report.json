@@ -1,19 +1,28 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T20:56:47.801Z",
-  "summary": "Diff implements backend authorization changes to allow authenticated principals (non-anonymous) to create lobbies via joinLobby and save profiles via saveCallerUserProfile, while trapping anonymous callers with clearer Unauthorized messages. Frontend LobbyView now gates Create New Lobby behind authentication and improves error toasts by extracting more specific messages from backend errors via a new utility.",
-  "missing_requirements": [],
+  "generatedAt": "2026-02-12T22:44:10.887Z",
+  "summary": "Backend joinLobby/leaveLobby now block anonymous callers via explicit caller.isAnonymous() traps and appear to remove prior permission-based deadlocks for leaveLobby. Frontend LobbyView now shows contextual, extracted backend error messages and logs raw errors. However, the diff does not provide evidence that all other multiplayer methods cited in REQ-29 (updatePlayerPosition, getPlayersInGame, startGame, endGame) had their permission checks revised, and the frontend adds a new profile-setup prerequisite for creating a lobby that was not requested and may conflict with the intent that first-time authenticated users can create a lobby without extra prerequisites.",
+  "missing_requirements": [
+    {
+      "id": "REQ-29",
+      "requirement": "Remove/revise backend permission checks that rely on #user permissions for normal gameplay actions (e.g., updatePlayerPosition, getPlayersInGame, startGame, endGame) so authenticated users can perform expected actions without manual permission assignment, while anonymous callers remain blocked.",
+      "reason": "Only joinLobby and part of leaveLobby are visible in the truncated backend diff; there is no diff evidence showing updates to updatePlayerPosition, getPlayersInGame, startGame, or endGame authorization logic.",
+      "evidence": [
+        "backend/main.mo (truncated)"
+      ]
+    }
+  ],
   "hallucinated_features": [
     {
-      "description": "Frontend now blocks lobby creation if the caller’s profile is not set up (requires completing profile setup first).",
-      "reason": "REQ-14 only requires gating lobby creation on Internet Identity authentication, not on presence of a user profile; this adds an additional prerequisite for creating a lobby.",
+      "description": "Frontend requires a completed user profile setup before allowing lobby creation (blocks authenticated users with null profile).",
+      "reason": "REQ-30 asks to surface real backend error reasons on lobby creation failure while preserving existing authentication gating; it does not request adding a new profile prerequisite for creating lobbies, and this could prevent first-time authenticated users from creating a lobby.",
       "evidence": [
         "frontend/src/pages/LobbyView.tsx"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.62,
   "changed_files": [
     "backend/main.mo",
     "frontend-file-summaries.txt",

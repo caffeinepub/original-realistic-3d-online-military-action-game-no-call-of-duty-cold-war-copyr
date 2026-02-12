@@ -14,14 +14,12 @@ actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // User profile type
   public type UserProfile = {
     username : Text;
     gamesPlayed : Nat;
     wins : Nat;
   };
 
-  // Game core types
   public type PlayerId = Principal;
   public type Position = {
     x : Float;
@@ -38,10 +36,18 @@ actor {
     username : Text;
   };
 
+  public type GameMap = {
+    #island;
+    #jungle;
+    #city;
+    #desert;
+  };
+
   public type LobbyState = {
     id : Nat;
     owner : PlayerId;
     players : [PlayerId];
+    selectedMap : GameMap;
   };
 
   public type MatchState = {
@@ -49,6 +55,7 @@ actor {
     players : [PlayerId];
     startTime : Time.Time;
     isActive : Bool;
+    map : GameMap;
   };
 
   public type GameState = {
@@ -58,19 +65,16 @@ actor {
     isGameStarted : Bool;
   };
 
-  // Storage
   let userProfiles = Map.empty<Principal, UserProfile>();
   let lobbies = Map.empty<Nat, LobbyState>();
   let matches = Map.empty<Nat, MatchState>();
   let playerStates = Map.empty<PlayerId, PlayerState>();
   let games = Map.empty<Nat, GameState>();
 
-  // Actor state for managing IDs
   var nextLobbyId = 1;
   var nextMatchId = 1;
   var nextGameId = 1;
 
-  // User profile functions
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (caller.isAnonymous()) { Runtime.trap("Unauthorized: Only authenticated users can view profiles") };
     userProfiles.get(caller);
@@ -88,9 +92,10 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Join a lobby
   public shared ({ caller }) func joinLobby() : async LobbyState {
-    if (caller.isAnonymous()) { Runtime.trap("Unauthorized: Only authenticated users can join lobbies") };
+    if (caller.isAnonymous()) { 
+      Runtime.trap("Unauthorized: Only authenticated users can join lobbies") 
+    };
 
     let lobbyId = nextLobbyId;
     nextLobbyId += 1;
@@ -99,21 +104,20 @@ actor {
       id = lobbyId;
       owner = caller;
       players = [caller];
+      selectedMap = #island;
     };
     lobbies.add(lobbyId, newLobby);
     newLobby;
   };
 
-  // Leave lobby
   public shared ({ caller }) func leaveLobby(lobbyId : Nat) : async LobbyState {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can leave lobbies");
+    if (caller.isAnonymous()) { 
+      Runtime.trap("Unauthorized: Only authenticated users can leave lobbies") 
     };
 
     switch (lobbies.get(lobbyId)) {
       case (null) { Runtime.trap("Lobby not found") };
       case (?lobby) {
-        // Verify caller is in the lobby
         let isInLobby = lobby.players.find(func(p) { p == caller });
         if (isInLobby == null and not AccessControl.isAdmin(accessControlState, caller)) {
           Runtime.trap("Unauthorized: You are not in this lobby");
@@ -130,6 +134,7 @@ actor {
           id = lobbyId;
           owner = newOwner;
           players = remainingPlayers;
+          selectedMap = lobby.selectedMap;
         };
 
         if (remainingPlayers.size() == 0) {
@@ -142,10 +147,9 @@ actor {
     };
   };
 
-  // Update player position
   public shared ({ caller }) func updatePlayerPosition(position : Position) : async [PlayerState] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can update position");
+    if (caller.isAnonymous()) { 
+      Runtime.trap("Unauthorized: Only authenticated users can update positions") 
     };
 
     let username = switch (userProfiles.get(caller)) {
@@ -172,10 +176,9 @@ actor {
     sortedPlayers;
   };
 
-  // Get all players in game - open to all authenticated users
   public query ({ caller }) func getPlayersInGame() : async [PlayerState] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view game state");
+    if (caller.isAnonymous()) { 
+      Runtime.trap("Unauthorized: Only authenticated users can view game state") 
     };
 
     playerStates.values().toArray().sort<PlayerState>(
@@ -185,46 +188,71 @@ actor {
     );
   };
 
-  // Get active lobbies - open to all users including guests
   public query ({ caller }) func getActiveLobbies() : async [LobbyState] {
     lobbies.values().toArray();
   };
 
-  // Start a new game
-  public shared ({ caller }) func startGame(players : [PlayerId]) : async GameState {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can start games");
+  public shared ({ caller }) func selectMap(lobbyId : Nat, map : GameMap) : async () {
+    if (caller.isAnonymous()) { 
+      Runtime.trap("Unauthorized: Only authenticated users can select maps") 
     };
 
-    // Verify caller is in the player list or is admin
-    let isInGame = players.find(func(p) { p == caller });
-    if (isInGame == null and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: You must be a player to start this game");
+    switch (lobbies.get(lobbyId)) {
+      case (null) { Runtime.trap("Lobby not found") };
+      case (?lobby) {
+        if (caller != lobby.owner and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Only the host can select the map");
+        };
+        let updatedLobby = {
+          id = lobby.id;
+          owner = lobby.owner;
+          players = lobby.players;
+          selectedMap = map;
+        };
+        lobbies.add(lobbyId, updatedLobby);
+      };
     };
-
-    let gameId = nextGameId;
-    nextGameId += 1;
-
-    let newGame : GameState = {
-      id = gameId;
-      players;
-      lastUpdate = Time.now();
-      isGameStarted = true;
-    };
-    games.add(gameId, newGame);
-    newGame;
   };
 
-  // End a game
+  public shared ({ caller }) func startGame(lobbyId : Nat) : async MatchState {
+    if (caller.isAnonymous()) { 
+      Runtime.trap("Unauthorized: Only authenticated users can start games") 
+    };
+
+    switch (lobbies.get(lobbyId)) {
+      case (null) { Runtime.trap("Lobby not found") };
+      case (?lobby) {
+        if (caller != lobby.owner and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Only the lobby host can start the game");
+        };
+
+        let matchId = nextMatchId;
+        nextMatchId += 1;
+
+        let newMatch : MatchState = {
+          id = matchId;
+          players = lobby.players;
+          startTime = Time.now();
+          isActive = true;
+          map = lobby.selectedMap;
+        };
+        matches.add(matchId, newMatch);
+
+        lobbies.remove(lobbyId);
+
+        newMatch;
+      };
+    };
+  };
+
   public shared ({ caller }) func endGame(gameId : Nat) : async GameState {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can end games");
+    if (caller.isAnonymous()) { 
+      Runtime.trap("Unauthorized: Only authenticated users can end games") 
     };
 
     switch (games.get(gameId)) {
       case (null) { Runtime.trap("Game not found") };
       case (?game) {
-        // Verify caller is in the game or is admin
         let isInGame = game.players.find(func(p) { p == caller });
         if (isInGame == null and not AccessControl.isAdmin(accessControlState, caller)) {
           Runtime.trap("Unauthorized: Only players in this game can end it");

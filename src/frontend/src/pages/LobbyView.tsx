@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
-import { useGetActiveLobbies, useJoinLobby, useLeaveLobby, useStartGame, useGetCallerUserProfile } from '../hooks/useQueries';
+import { useGetActiveLobbies, useJoinLobby, useLeaveLobby, useStartGame, useGetCallerUserProfile, useSelectMap } from '../hooks/useQueries';
 import LoginButton from '../ui/LoginButton';
 import ProfileSetupDialog from '../ui/ProfileSetupDialog';
 import DisclaimerFooter from '../ui/DisclaimerFooter';
 import type { AppView } from '../App';
-import { ArrowLeft, Users, Play, LogOut, Lock } from 'lucide-react';
+import { ArrowLeft, Users, Play, LogOut, Lock, Map } from 'lucide-react';
 import { toast } from 'sonner';
 import { extractErrorMessage } from '../utils/errorMessages';
+import { getAllMaps, getMapInfo } from '../game/maps/mapRegistry';
+import { GameMap } from '../backend';
 
 interface LobbyViewProps {
   onNavigate: (view: AppView, lobbyId?: bigint) => void;
@@ -22,6 +24,7 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
   const joinLobbyMutation = useJoinLobby();
   const leaveLobbyMutation = useLeaveLobby();
   const startGameMutation = useStartGame();
+  const selectMapMutation = useSelectMap();
   const [currentLobby, setCurrentLobby] = useState<bigint | null>(null);
 
   const isAuthenticated = !!identity;
@@ -48,8 +51,11 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
       setCurrentLobby(lobby.id);
       toast.success('Lobby created successfully');
     } catch (error) {
+      // Extract user-friendly message
       const userMessage = extractErrorMessage(error);
-      toast.error(userMessage);
+      // Show contextual error message
+      toast.error(`Could not create lobby: ${userMessage}`);
+      // Log full error for debugging
       console.error('Lobby creation error:', error);
     }
   };
@@ -62,20 +68,32 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
       toast.success('Left lobby');
     } catch (error) {
       const userMessage = extractErrorMessage(error);
-      toast.error(userMessage);
+      toast.error(`Could not leave lobby: ${userMessage}`);
       console.error('Leave lobby error:', error);
+    }
+  };
+
+  const handleMapSelect = async (map: GameMap) => {
+    if (!myLobby) return;
+    try {
+      await selectMapMutation.mutateAsync({ lobbyId: myLobby.id, map });
+      toast.success(`Map changed to ${getMapInfo(map).displayName}`);
+    } catch (error) {
+      const userMessage = extractErrorMessage(error);
+      toast.error(`Could not change map: ${userMessage}`);
+      console.error('Map selection error:', error);
     }
   };
 
   const handleStartGame = async () => {
     if (!myLobby) return;
     try {
-      await startGameMutation.mutateAsync(myLobby.players);
+      await startGameMutation.mutateAsync(myLobby.id);
       toast.success('Starting game...');
       onNavigate('online-game', myLobby.id);
     } catch (error) {
       const userMessage = extractErrorMessage(error);
-      toast.error(userMessage);
+      toast.error(`Could not start game: ${userMessage}`);
       console.error('Start game error:', error);
     }
   };
@@ -88,6 +106,7 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
 
   const isOwner = myLobby && myLobby.owner.toString() === myPrincipal;
   const canCreateLobby = isAuthenticated && !profileLoading && isFetched && userProfile !== null;
+  const availableMaps = getAllMaps();
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
@@ -149,6 +168,51 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
                 >
                   Leave Lobby
                 </button>
+              </div>
+
+              {/* Map Selection */}
+              <div className="space-y-3 p-4 bg-background/30 rounded border border-border/50">
+                <div className="flex items-center gap-2">
+                  <Map className="w-5 h-5 text-accent" />
+                  <h3 className="text-sm font-medium text-white">Selected Map</h3>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent/30 rounded">
+                    <div>
+                      <p className="font-medium text-white">{getMapInfo(myLobby.selectedMap).displayName}</p>
+                      <p className="text-xs text-muted-foreground">{getMapInfo(myLobby.selectedMap).description}</p>
+                    </div>
+                  </div>
+                  {isOwner && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        All maps are original designs created for this game
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableMaps.map((mapInfo) => (
+                          <button
+                            key={mapInfo.id}
+                            onClick={() => handleMapSelect(mapInfo.id)}
+                            disabled={selectMapMutation.isPending || myLobby.selectedMap === mapInfo.id}
+                            className={`p-3 rounded text-left transition-colors disabled:opacity-50 ${
+                              myLobby.selectedMap === mapInfo.id
+                                ? 'bg-accent/20 border border-accent/50'
+                                : 'bg-background/50 border border-border hover:bg-background/70'
+                            }`}
+                          >
+                            <p className="text-sm font-medium">{mapInfo.displayName}</p>
+                            <p className="text-xs text-muted-foreground">{mapInfo.description}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {!isOwner && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      Only the host can change the map
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -230,7 +294,7 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
                     <div>
                       <p className="font-medium">Lobby #{lobby.id.toString()}</p>
                       <p className="text-sm text-muted-foreground">
-                        {lobby.players.length} player{lobby.players.length !== 1 ? 's' : ''}
+                        {lobby.players.length} player{lobby.players.length !== 1 ? 's' : ''} · {getMapInfo(lobby.selectedMap).displayName}
                       </p>
                     </div>
                     <div className="text-sm text-muted-foreground">

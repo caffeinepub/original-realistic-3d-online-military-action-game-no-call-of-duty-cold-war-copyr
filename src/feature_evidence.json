@@ -2,8 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-improve-the-lobby-ui-error-handling-for-lobby-creation-failures-by-displaying-a-more-specific-user-readable-error-message-e-g-include-backend-error-text-when-available-instead-of-only-the-generic-toast-failed-to-create-lobby",
-      "featureTitle": "Improve the Lobby UI error handling for lobby creation failures by displaying a more specific, user-readable error message (e.g., include backend error text when available) instead of only the generic toast 'Failed to create lobby'.",
+      "featureId": "feature-ensure-the-lobby-ui-surfaces-the-real-backend-error-reason-when-lobby-creation-fails-instead-of-a-generic-message-like-failed-using-english-user-facing-text",
+      "featureTitle": "Ensure the Lobby UI surfaces the real backend error reason when lobby creation fails (instead of a generic message like \"failed\"), using English user-facing text.",
       "files": [
         "frontend/src/pages/LobbyView.tsx",
         "frontend/src/utils/errorMessages.ts"
@@ -17,26 +17,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-13"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-prevent-unauthenticated-users-from-attempting-to-create-a-lobby-from-the-lobby-screen-disable-or-gate-the-create-new-lobby-action-when-internet-identity-is-not-connected-and-show-an-english-prompt-to-sign-in",
-      "featureTitle": "Prevent unauthenticated users from attempting to create a lobby from the Lobby screen: disable or gate the 'Create New Lobby' action when Internet Identity is not connected, and show an English prompt to sign in.",
-      "files": [
-        "frontend/src/pages/LobbyView.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-14"
+        "REQ-30"
       ],
       "confidence": "high"
     }

@@ -1,7 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
 import * as THREE from 'three';
+import RemotePlayerLabel from './RemotePlayerLabel';
 
 interface RemotePlayerAvatarProps {
   position: [number, number, number];
@@ -14,11 +14,16 @@ export default function RemotePlayerAvatar({ position, rotation, username }: Rem
   const targetPosition = useRef(new THREE.Vector3(...position));
   const targetRotation = useRef(rotation);
 
+  // Update target refs only when props change, not every frame
+  useMemo(() => {
+    targetPosition.current.set(...position);
+    targetRotation.current = rotation;
+  }, [position, rotation]);
+
   useFrame(() => {
     if (!groupRef.current) return;
 
     // Smooth interpolation
-    targetPosition.current.set(...position);
     groupRef.current.position.lerp(targetPosition.current, 0.2);
     
     const currentY = groupRef.current.rotation.y;
@@ -26,10 +31,6 @@ export default function RemotePlayerAvatar({ position, rotation, username }: Rem
     const shortestDiff = ((diff + Math.PI) % (Math.PI * 2)) - Math.PI;
     groupRef.current.rotation.y += shortestDiff * 0.2;
   });
-
-  const displayName = username.length > 20 
-    ? `${username.slice(0, 8)}...${username.slice(-6)}`
-    : username;
 
   return (
     <group ref={groupRef} position={position}>
@@ -51,12 +52,8 @@ export default function RemotePlayerAvatar({ position, rotation, username }: Rem
         <meshStandardMaterial color="#ff6b35" roughness={0.5} metalness={0.5} />
       </mesh>
 
-      {/* Name label */}
-      <Html position={[0, 2.3, 0]} center distanceFactor={10}>
-        <div className="bg-black/70 text-white px-2 py-1 rounded text-xs font-mono whitespace-nowrap">
-          {displayName}
-        </div>
-      </Html>
+      {/* Name label using WebGL sprite instead of DOM */}
+      <RemotePlayerLabel username={username} position={[0, 2.3, 0]} />
     </group>
   );
 }

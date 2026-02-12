@@ -5,33 +5,73 @@ import useFpsControls from '../controls/useFpsControls';
 import PlayerArmsAndWeapon from '../components/PlayerArmsAndWeapon';
 import ImpactEffects from '../components/ImpactEffects';
 import RemotePlayerAvatar from '../components/RemotePlayerAvatar';
-import { useGetPlayersInGame, useUpdatePlayerPosition } from '../../hooks/useQueries';
+import { useGetPlayersInGame, useUpdatePlayerPosition, useGetActiveLobbies } from '../../hooks/useQueries';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
+import { useGraphicsSettings } from '../settings/useGraphicsSettings';
+import { getGraphicsSettings } from '../settings/graphics';
+import { getMapInfo } from '../maps/mapRegistry';
+import { GameMap } from '../../backend';
 
-export default function OnlineMatchScene() {
+interface OnlineMatchSceneProps {
+  lobbyId: bigint | null;
+}
+
+export default function OnlineMatchScene({ lobbyId }: OnlineMatchSceneProps) {
   const { position, rotation, cameraRef } = useFpsControls();
   const { identity } = useInternetIdentity();
   const { data: players = [] } = useGetPlayersInGame();
+  const { data: lobbies = [] } = useGetActiveLobbies();
   const updatePosition = useUpdatePlayerPosition();
   const impactRef = useRef<{ addImpact: (point: THREE.Vector3) => void }>(null);
   const lastUpdateTime = useRef(0);
+  const lastPosition = useRef({ x: 0, y: 0, z: 0, rotation: 0 });
+  const { graphicsMode } = useGraphicsSettings();
+  const settings = getGraphicsSettings(graphicsMode);
 
   const myPrincipal = identity?.getPrincipal().toString();
+
+  // Resolve the map for this lobby
+  const currentLobby = lobbyId ? lobbies.find(l => l.id === lobbyId) : null;
+  const selectedMap = currentLobby?.selectedMap ?? GameMap.island;
+  const mapInfo = getMapInfo(selectedMap);
+  const MapComponent = mapInfo.component;
 
   useFrame(({ camera, clock }) => {
     camera.position.set(position.x, position.y, position.z);
     camera.rotation.set(rotation.x, rotation.y, rotation.z);
 
-    // Send position updates every 100ms
+    // Throttle position updates with movement threshold
     const now = clock.getElapsedTime();
     if (now - lastUpdateTime.current > 0.1) {
-      lastUpdateTime.current = now;
-      updatePosition.mutate({
-        x: position.x,
-        y: position.y,
-        z: position.z,
-        rotation: rotation.y,
-      });
+      const dx = position.x - lastPosition.current.x;
+      const dy = position.y - lastPosition.current.y;
+      const dz = position.z - lastPosition.current.z;
+      const dr = Math.abs(rotation.y - lastPosition.current.rotation);
+      
+      const movementThreshold = 0.01;
+      const rotationThreshold = 0.01;
+      
+      const hasMoved = Math.abs(dx) > movementThreshold || 
+                       Math.abs(dy) > movementThreshold || 
+                       Math.abs(dz) > movementThreshold ||
+                       dr > rotationThreshold;
+
+      if (hasMoved) {
+        lastUpdateTime.current = now;
+        lastPosition.current = {
+          x: position.x,
+          y: position.y,
+          z: position.z,
+          rotation: rotation.y,
+        };
+        
+        updatePosition.mutate({
+          x: position.x,
+          y: position.y,
+          z: position.z,
+          rotation: rotation.y,
+        });
+      }
     }
   });
 
@@ -47,8 +87,8 @@ export default function OnlineMatchScene() {
       <directionalLight
         position={[10, 20, 10]}
         intensity={1.5}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
+        castShadow={settings.shadowsEnabled}
+        shadow-mapSize={[settings.shadowMapSize, settings.shadowMapSize]}
         shadow-camera-left={-20}
         shadow-camera-right={20}
         shadow-camera-top={20}
@@ -56,42 +96,8 @@ export default function OnlineMatchScene() {
       />
       <hemisphereLight args={['#87ceeb', '#545454', 0.5]} />
 
-      {/* Ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0, 0]}>
-        <planeGeometry args={[100, 100]} />
-        <meshStandardMaterial 
-          color="#3a3a3a" 
-          roughness={0.8}
-          metalness={0.2}
-        />
-      </mesh>
-
-      {/* Training structures (same as training scene) */}
-      <mesh position={[-10, 1.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.5, 3, 20]} />
-        <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
-      </mesh>
-      <mesh position={[10, 1.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.5, 3, 20]} />
-        <meshStandardMaterial color="#4a4a4a" roughness={0.9} />
-      </mesh>
-
-      {[
-        [0, 0.5, -5],
-        [3, 0.5, -8],
-        [-3, 0.5, -8],
-        [5, 0.75, -12],
-        [-5, 0.75, -12],
-      ].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} castShadow receiveShadow>
-          <boxGeometry args={[1.5, pos[1] * 2, 1.5]} />
-          <meshStandardMaterial 
-            color="#5a5a5a" 
-            roughness={0.85}
-            metalness={0.1}
-          />
-        </mesh>
-      ))}
+      {/* Render selected map */}
+      <MapComponent />
 
       {/* Remote players */}
       {remotePlayers.map((player) => (

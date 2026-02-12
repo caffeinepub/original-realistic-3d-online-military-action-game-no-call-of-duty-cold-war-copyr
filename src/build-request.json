@@ -1,87 +1,75 @@
 {
   "kind": "build_request",
-  "title": "Fix lobby creation failure (Create New Lobby shows 'Failed')",
+  "title": "Fix Multiplayer Lobby Creation Failure for Authenticated Users",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-11",
-      "text": "Fix backend authorization so an authenticated Internet Identity user can successfully create a lobby via joinLobby (and does not hit an 'Unauthorized' trap due to missing #user permission). Ensure the anonymous principal is still blocked from creating lobbies.",
+      "id": "REQ-28",
+      "text": "Fix backend authorization so an authenticated Internet Identity user can successfully create a new lobby via the joinLobby method, while the anonymous principal remains blocked.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "recent-messages-4",
+          "recent-messages-7"
         ],
         "quotes": [
-          "i can't create a new lobby it say failed"
+          "MULTIPLAYER LOBBY not let me create new lobby",
+          "try again"
         ]
       },
       "acceptanceCriteria": [
-        "Calling joinLobby as an authenticated principal succeeds and returns a LobbyState.",
-        "Calling joinLobby as the anonymous principal traps with a clear unauthorized error.",
-        "The change does not require a state migration (no migration.mo added unless strictly necessary)."
+        "When signed in with Internet Identity, calling joinLobby returns a LobbyState and persists the lobby so it appears in getActiveLobbies.",
+        "When not signed in (anonymous caller), calling joinLobby traps with an Unauthorized error.",
+        "Creating a lobby does not require any pre-existing permissions that a first-time user would not have."
       ]
     },
     {
-      "id": "REQ-12",
-      "text": "Fix backend authorization so an authenticated Internet Identity user can save a user profile via saveCallerUserProfile without requiring pre-existing #user permissions (avoid a permissions deadlock for first-time users). Anonymous principal must still be blocked.",
+      "id": "REQ-29",
+      "text": "Remove or revise backend permission checks that currently rely on #user permissions in a way that can deadlock normal gameplay (e.g., leaveLobby, updatePlayerPosition, getPlayersInGame, startGame, endGame), so that authenticated users can perform expected multiplayer actions without needing manual permission assignment, while anonymous callers remain blocked.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "recent-messages-4"
         ],
         "quotes": [
-          "i can't create a new lobby it say failed"
+          "MULTIPLAYER LOBBY not let me create new lobby"
         ]
       },
       "acceptanceCriteria": [
-        "Authenticated users can call saveCallerUserProfile successfully even on first login.",
-        "Anonymous principal cannot call saveCallerUserProfile.",
-        "Existing user profiles continue to load correctly via getCallerUserProfile for authenticated users."
+        "Authenticated users can leave a lobby they are in using leaveLobby without hitting an Unauthorized error caused solely by missing #user permission.",
+        "Authenticated users can updatePlayerPosition and fetch getPlayersInGame without hitting an Unauthorized error caused solely by missing #user permission.",
+        "Authenticated lobby host can startGame without hitting an Unauthorized error caused solely by missing #user permission.",
+        "Anonymous callers are still rejected (Unauthorized) for multiplayer state-changing actions."
       ]
     },
     {
-      "id": "REQ-13",
-      "text": "Improve the Lobby UI error handling for lobby creation failures by displaying a more specific, user-readable error message (e.g., include backend error text when available) instead of only the generic toast 'Failed to create lobby'.",
+      "id": "REQ-30",
+      "text": "Ensure the Lobby UI surfaces the real backend error reason when lobby creation fails (instead of a generic message like \"failed\"), using English user-facing text.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "recent-messages-4"
         ],
         "quotes": [
-          "i can't create a new lobby it say failed"
+          "MULTIPLAYER LOBBY not let me create new lobby"
         ]
       },
       "acceptanceCriteria": [
-        "When Create New Lobby fails, the toast includes a specific reason when available (e.g., unauthorized/anonymous/other trap message), while still being in English and user-friendly.",
-        "Console logging remains available for debugging, but the user-facing toast is more informative than the current generic message."
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Prevent unauthenticated users from attempting to create a lobby from the Lobby screen: disable or gate the 'Create New Lobby' action when Internet Identity is not connected, and show an English prompt to sign in.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "i can't create a new lobby it say failed"
-        ]
-      },
-      "acceptanceCriteria": [
-        "If the user is not signed in, clicking Create New Lobby does not call the joinLobby mutation.",
-        "The UI clearly indicates sign-in is required to create a lobby (English text).",
-        "If the user signs in, the Create New Lobby action becomes available without needing a page reload."
+        "If lobby creation fails due to backend trap/Unauthorized/not found, the toast shows a specific, English message that reflects the underlying reason (not only \"failed\" or \"An unexpected error occurred\").",
+        "Console logging still includes the raw error object for debugging.",
+        "The existing authentication gating behavior remains intact (unauthenticated users cannot attempt to create a lobby)."
       ]
     }
   ],
   "constraints": [
     "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
+    "Do not edit frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Use English for all user-facing text."
   ],
   "nonGoals": [
-    "Adding new multiplayer gameplay features beyond fixing lobby creation and related authorization.",
-    "Implementing real-time networking (WebSockets) or external databases/auth providers."
+    "Adding new multiplayer features (chat, voice, matchmaking, or WebSockets).",
+    "Changing map content, weapons, or graphics/performance settings.",
+    "Introducing any external database or third-party auth besides Internet Identity."
   ],
   "imageRequirements": {
     "required": [],

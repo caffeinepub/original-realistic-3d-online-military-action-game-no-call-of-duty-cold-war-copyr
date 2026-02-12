@@ -4,6 +4,10 @@ import OnlineMatchScene from '../game/scenes/OnlineMatchScene';
 import HudOverlay from '../ui/HudOverlay';
 import type { AppView } from '../App';
 import { X } from 'lucide-react';
+import { useGraphicsSettings } from '../game/settings/useGraphicsSettings';
+import { useDebugSettings } from '../game/settings/useDebugSettings';
+import type { GraphicsMode } from '../game/settings/graphics';
+import PerformanceOverlay from '../ui/PerformanceOverlay';
 
 interface OnlineGameViewProps {
   onNavigate: (view: AppView) => void;
@@ -12,6 +16,8 @@ interface OnlineGameViewProps {
 
 export default function OnlineGameView({ onNavigate, lobbyId }: OnlineGameViewProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const { graphicsMode, setGraphicsMode } = useGraphicsSettings();
+  const { showPerformanceOverlay, setShowPerformanceOverlay } = useDebugSettings();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -27,10 +33,12 @@ export default function OnlineGameView({ onNavigate, lobbyId }: OnlineGameViewPr
   return (
     <div className="relative w-full h-screen">
       <GameCanvas>
-        <OnlineMatchScene />
+        <OnlineMatchScene lobbyId={lobbyId} />
       </GameCanvas>
       
       <HudOverlay mode="online" />
+
+      {showPerformanceOverlay && <PerformanceOverlay />}
 
       {/* ESC Menu */}
       {showMenu && (
@@ -59,6 +67,33 @@ export default function OnlineGameView({ onNavigate, lobbyId }: OnlineGameViewPr
               >
                 Return to Lobby
               </button>
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-border">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Graphics Mode</span>
+                <select
+                  value={graphicsMode}
+                  onChange={(e) => setGraphicsMode(e.target.value as GraphicsMode)}
+                  className="bg-background border border-border rounded px-3 py-1 text-sm"
+                >
+                  <option value="Balanced">Balanced</option>
+                  <option value="Performance">Performance</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Performance Overlay</span>
+                <button
+                  onClick={() => setShowPerformanceOverlay(!showPerformanceOverlay)}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                    showPerformanceOverlay 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}
+                >
+                  {showPerformanceOverlay ? 'On' : 'Off'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -1,32 +1,32 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T20:56:47.804Z",
+  "generatedAt": "2026-02-12T22:44:10.891Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-11",
-        "summary": "Fix backend authorization so an authenticated Internet Identity user can successfully create a lobby via joinLobby (and does not hit an 'Unauthorized' trap due to missing #user permission). Ensure the anonymous principal is still blocked from creating lobbies.",
+        "id": "REQ-28",
+        "summary": "Fix backend authorization so an authenticated Internet Identity user can successfully create a new lobby via the joinLobby method, while the anonymous principal remains blocked.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-12",
-        "summary": "Fix backend authorization so an authenticated Internet Identity user can save a user profile via saveCallerUserProfile without requiring pre-existing #user permissions (avoid a permissions deadlock for first-time users). Anonymous principal must still be blocked.",
+        "id": "REQ-29",
+        "summary": "Remove or revise backend permission checks that currently rely on #user permissions in a way that can deadlock normal gameplay (e.g., leaveLobby, updatePlayerPosition, getPlayersInGame, startGame, endGame), so that authenticated users can perform expected multiplayer actions without needing manual permission assignment, while anonymous callers remain blocked.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-13",
-        "summary": "Improve the Lobby UI error handling for lobby creation failures by displaying a more specific, user-readable error message (e.g., include backend error text when available) instead of only the generic toast 'Failed to create lobby'.",
+        "id": "REQ-30",
+        "summary": "Ensure the Lobby UI surfaces the real backend error reason when lobby creation fails (instead of a generic message like \"failed\"), using English user-facing text.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/utils/errorMessages.ts",
@@ -34,17 +34,6 @@
         ],
         "matchedFiles": [
           "frontend/src/utils/errorMessages.ts",
-          "frontend/src/pages/LobbyView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-14",
-        "summary": "Prevent unauthenticated users from attempting to create a lobby from the Lobby screen: disable or gate the 'Create New Lobby' action when Internet Identity is not connected, and show an English prompt to sign in.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/LobbyView.tsx"
-        ],
-        "matchedFiles": [
           "frontend/src/pages/LobbyView.tsx"
         ]
       }

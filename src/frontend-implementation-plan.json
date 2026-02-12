@@ -1,41 +1,26 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Improve lobby creation UX: auth gating + specific error toasts",
+  "title": "Surface Real Backend Errors in Multiplayer Lobby Creation UI",
   "requirements": [
     {
-      "id": "REQ-13",
-      "summary": "Show user-friendly, specific lobby creation error messages by surfacing backend trap text when available.",
+      "id": "REQ-30",
+      "summary": "Show specific, English lobby-creation failure reasons from backend traps/rejections (instead of generic failure), while keeping raw error logging and existing auth gating.",
       "acceptanceCriteria": [
-        "When Create New Lobby fails, the toast includes a specific reason when available (e.g., unauthorized/anonymous/other trap message), while still being in English and user-friendly.",
-        "Console logging remains available for debugging, but the user-facing toast is more informative than the current generic message."
+        "If lobby creation fails due to backend trap/Unauthorized/not found, the toast shows a specific, English message that reflects the underlying reason (not only \"failed\" or \"An unexpected error occurred\").",
+        "Console logging still includes the raw error object for debugging.",
+        "The existing authentication gating behavior remains intact (unauthenticated users cannot attempt to create a lobby)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/utils/errorMessages.ts",
-          "operation": "create",
-          "description": "Add a small helper to normalize unknown thrown values into a user-friendly English message (e.g., extract Error.message / common agent trap strings) while preserving raw details for console logging."
+          "operation": "modify",
+          "description": "Improve error extraction to reliably surface the underlying backend rejection/trap reason (e.g., Unauthorized vs not found vs transient/network), including handling common agent error shapes (message/reject_message/error_code) and returning clear English user-facing text. Align behavior with the selected \"authorization\" component’s guidance on handling authorization errors from backend trap calls. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/LobbyView.tsx",
           "operation": "modify",
-          "description": "Update the Create New Lobby failure handling to use the new error-message helper and include specific backend error text when available (e.g., unauthorized vs other failures). Keep console.error for debugging. Use the selected authorization component's frontend guidance to handle authorization traps gracefully in UI; verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "summary": "Gate lobby creation behind Internet Identity authentication and prompt users to sign in when not connected.",
-      "acceptanceCriteria": [
-        "If the user is not signed in, clicking Create New Lobby does not call the joinLobby mutation.",
-        "The UI clearly indicates sign-in is required to create a lobby (English text).",
-        "If the user signs in, the Create New Lobby action becomes available without needing a page reload."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/LobbyView.tsx",
-          "operation": "modify",
-          "description": "Disable or gate the 'Create New Lobby' button when Internet Identity is not connected (identity is falsy). When unauthenticated, prevent calling the joinLobby mutation and instead show an English prompt (toast) to sign in; optionally add inline helper text near the button. Ensure the enabled/disabled state updates reactively when identity changes (no reload). Use the selected authorization component's frontend guidance for authentication-aware UI states; verify the component's usage instructions before implementing."
+          "description": "Update lobby creation failure handling to present a specific, contextual toast message derived from the enhanced extractErrorMessage (e.g., prefix with \"Could not create lobby:\" when appropriate), while keeping console.error logging of the raw error object and preserving the existing authentication/profile gating that prevents unauthenticated users from attempting lobby creation. Verify the component's usage instructions before implementing."
         }
       ]
     }

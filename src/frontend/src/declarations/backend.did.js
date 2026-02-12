@@ -21,8 +21,15 @@ export const GameState = IDL.Record({
   'lastUpdate' : Time,
   'players' : IDL.Vec(PlayerId),
 });
+export const GameMap = IDL.Variant({
+  'jungle' : IDL.Null,
+  'city' : IDL.Null,
+  'desert' : IDL.Null,
+  'island' : IDL.Null,
+});
 export const LobbyState = IDL.Record({
   'id' : IDL.Nat,
+  'selectedMap' : GameMap,
   'owner' : PlayerId,
   'players' : IDL.Vec(PlayerId),
 });
@@ -44,6 +51,13 @@ export const PlayerState = IDL.Record({
   'position' : Position,
   'health' : IDL.Nat,
 });
+export const MatchState = IDL.Record({
+  'id' : IDL.Nat,
+  'map' : GameMap,
+  'startTime' : Time,
+  'isActive' : IDL.Bool,
+  'players' : IDL.Vec(PlayerId),
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -62,7 +76,8 @@ export const idlService = IDL.Service({
   'joinLobby' : IDL.Func([], [LobbyState], []),
   'leaveLobby' : IDL.Func([IDL.Nat], [LobbyState], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'startGame' : IDL.Func([IDL.Vec(PlayerId)], [GameState], []),
+  'selectMap' : IDL.Func([IDL.Nat, GameMap], [], []),
+  'startGame' : IDL.Func([IDL.Nat], [MatchState], []),
   'updatePlayerPosition' : IDL.Func([Position], [IDL.Vec(PlayerState)], []),
 });
 
@@ -82,8 +97,15 @@ export const idlFactory = ({ IDL }) => {
     'lastUpdate' : Time,
     'players' : IDL.Vec(PlayerId),
   });
+  const GameMap = IDL.Variant({
+    'jungle' : IDL.Null,
+    'city' : IDL.Null,
+    'desert' : IDL.Null,
+    'island' : IDL.Null,
+  });
   const LobbyState = IDL.Record({
     'id' : IDL.Nat,
+    'selectedMap' : GameMap,
     'owner' : PlayerId,
     'players' : IDL.Vec(PlayerId),
   });
@@ -105,6 +127,13 @@ export const idlFactory = ({ IDL }) => {
     'position' : Position,
     'health' : IDL.Nat,
   });
+  const MatchState = IDL.Record({
+    'id' : IDL.Nat,
+    'map' : GameMap,
+    'startTime' : Time,
+    'isActive' : IDL.Bool,
+    'players' : IDL.Vec(PlayerId),
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -123,7 +152,8 @@ export const idlFactory = ({ IDL }) => {
     'joinLobby' : IDL.Func([], [LobbyState], []),
     'leaveLobby' : IDL.Func([IDL.Nat], [LobbyState], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'startGame' : IDL.Func([IDL.Vec(PlayerId)], [GameState], []),
+    'selectMap' : IDL.Func([IDL.Nat, GameMap], [], []),
+    'startGame' : IDL.Func([IDL.Nat], [MatchState], []),
     'updatePlayerPosition' : IDL.Func([Position], [IDL.Vec(PlayerState)], []),
   });
 };

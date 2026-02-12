@@ -10,6 +10,7 @@ export type Option<T> = Some<T> | None;
 export type PlayerId = Principal;
 export interface LobbyState {
     id: bigint;
+    selectedMap: GameMap;
     owner: PlayerId;
     players: Array<PlayerId>;
 }
@@ -27,6 +28,13 @@ export interface PlayerState {
     position: Position;
     health: bigint;
 }
+export interface MatchState {
+    id: bigint;
+    map: GameMap;
+    startTime: Time;
+    isActive: boolean;
+    players: Array<PlayerId>;
+}
 export interface GameState {
     id: bigint;
     isGameStarted: boolean;
@@ -37,6 +45,12 @@ export interface UserProfile {
     username: string;
     gamesPlayed: bigint;
     wins: bigint;
+}
+export enum GameMap {
+    jungle = "jungle",
+    city = "city",
+    desert = "desert",
+    island = "island"
 }
 export enum UserRole {
     admin = "admin",
@@ -55,6 +69,7 @@ export interface backendInterface {
     joinLobby(): Promise<LobbyState>;
     leaveLobby(lobbyId: bigint): Promise<LobbyState>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    startGame(players: Array<PlayerId>): Promise<GameState>;
+    selectMap(lobbyId: bigint, map: GameMap): Promise<void>;
+    startGame(lobbyId: bigint): Promise<MatchState>;
     updatePlayerPosition(position: Position): Promise<Array<PlayerState>>;
 }
