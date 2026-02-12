@@ -1,111 +1,41 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "True offline mode + Offline Skirmish single-player expansion",
+  "title": "Improve lobby creation UX: auth gating + specific error toasts",
   "requirements": [
     {
-      "id": "REQ-8",
-      "summary": "Ensure true offline gameplay runs without Internet Identity and without any backend/canister calls, including eliminating React Query polling during offline play.",
+      "id": "REQ-13",
+      "summary": "Show user-friendly, specific lobby creation error messages by surfacing backend trap text when available.",
       "acceptanceCriteria": [
-        "A user can start offline gameplay without signing in via Internet Identity.",
-        "When playing offline, the frontend does not call backend queries/mutations (no polling requests such as getPlayersInGame).",
-        "If the backend is unreachable (e.g., network down), offline mode still loads and remains playable without showing repeated error toasts or blocking UI.",
-        "Online mode behavior remains unchanged (still requires sign-in to access lobby/online match)."
+        "When Create New Lobby fails, the toast includes a specific reason when available (e.g., unauthorized/anonymous/other trap message), while still being in English and user-friendly.",
+        "Console logging remains available for debugging, but the user-facing toast is more informative than the current generic message."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/ui/HudOverlay.tsx",
-          "operation": "modify",
-          "description": "Prevent backend polling in non-online modes by only invoking React Query hooks (e.g., useGetPlayersInGame) when mode is 'online'; keep training/offline HUD fully client-side."
-        },
-        {
-          "path": "frontend/src/pages/OfflineSkirmishView.tsx",
+          "path": "frontend/src/utils/errorMessages.ts",
           "operation": "create",
-          "description": "Create a dedicated offline gameplay view that does not import/use backend hooks, does not mount polling components, and handles offline-only pause/menu flow."
+          "description": "Add a small helper to normalize unknown thrown values into a user-friendly English message (e.g., extract Error.message / common agent trap strings) while preserving raw details for console logging."
         },
         {
-          "path": "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
-          "operation": "create",
-          "description": "Create an offline-only React Three Fiber scene that uses existing FPS controls + weapon handling and contains no backend/canister interactions."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/pages/LobbyView.tsx",
           "operation": "modify",
-          "description": "Wire the new offline view into app navigation state so it can be entered without authentication, while keeping existing lobby/online flows unchanged."
+          "description": "Update the Create New Lobby failure handling to use the new error-message helper and include specific backend error text when available (e.g., unauthorized vs other failures). Keep console.error for debugging. Use the selected authorization component's frontend guidance to handle authorization traps gracefully in UI; verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-9",
-      "summary": "Add a new Offline Skirmish mode (separate from Training) using existing FPS controls/Three.js pipeline with at least one locally simulated target and a working ESC menu.",
+      "id": "REQ-14",
+      "summary": "Gate lobby creation behind Internet Identity authentication and prompt users to sign in when not connected.",
       "acceptanceCriteria": [
-        "Home menu includes a clearly labeled offline-only option (English text) that does not require sign-in.",
-        "Offline Skirmish runs entirely client-side using the existing Three.js/React Three Fiber pipeline and FPS controls.",
-        "Offline Skirmish shows at least one locally simulated non-player entity (e.g., moving target/dummy) in the scene.",
-        "ESC menu works in Offline Skirmish (resume + return to menu)."
+        "If the user is not signed in, clicking Create New Lobby does not call the joinLobby mutation.",
+        "The UI clearly indicates sign-in is required to create a lobby (English text).",
+        "If the user signs in, the Create New Lobby action becomes available without needing a page reload."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/HomeView.tsx",
+          "path": "frontend/src/pages/LobbyView.tsx",
           "operation": "modify",
-          "description": "Add a clearly labeled 'Offline Skirmish' menu option that navigates to the new offline view without requiring Internet Identity authentication."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Extend AppView to include an offline skirmish route/state and render OfflineSkirmishView when selected."
-        },
-        {
-          "path": "frontend/src/pages/OfflineSkirmishView.tsx",
-          "operation": "create",
-          "description": "Implement the Offline Skirmish screen using GameCanvas + OfflineSkirmishScene and an ESC pause menu with Resume/Return to Menu actions."
-        },
-        {
-          "path": "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
-          "operation": "create",
-          "description": "Implement an offline skirmish scene that reuses useFpsControls and PlayerArmsAndWeapon, and includes at least one locally simulated moving target/dummy updated via useFrame."
-        }
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "summary": "Add offline scoring/stats HUD and at least two switchable weapon options/behaviors for offline play, with instructions in the pause menu and no impact on online flow.",
-      "acceptanceCriteria": [
-        "Offline mode includes a visible, updating score/stats indicator in the HUD (English text), such as hit count, accuracy, or time-based score.",
-        "Player can switch between at least two weapon options/behaviors during offline play (e.g., different fire rate/spread/ammo), with clear input instructions available in the pause menu.",
-        "Offline gameplay content additions do not change or break the existing online multiplayer flow, lobby flow, or synchronization HUD in online mode.",
-        "All added content remains original and does not reference or copy any copyrighted Call of Duty/Cold War assets, names, or UI styling."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/weapons/offlineWeapons.ts",
-          "operation": "create",
-          "description": "Define at least two offline-only weapon configurations/behaviors (original naming) for use in Offline Skirmish (e.g., different fire rate/spread/ammo semantics)."
-        },
-        {
-          "path": "frontend/src/game/weapons/useWeapon.ts",
-          "operation": "modify",
-          "description": "Extend the weapon hook to support configurable weapon behavior (e.g., fire rate/spread) and compute fire direction from the provided camera reference so offline weapon switching can change behavior client-side."
-        },
-        {
-          "path": "frontend/src/game/components/PlayerArmsAndWeapon.tsx",
-          "operation": "modify",
-          "description": "Update PlayerArmsAndWeapon to accept a selected weapon/config (from Offline Skirmish) while preserving current online/training behavior; keep visuals original and generic."
-        },
-        {
-          "path": "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
-          "operation": "modify",
-          "description": "Add local hit detection against the offline target(s) and update local stats (e.g., shots fired, hits, accuracy) and weapon selection state; keep all logic client-side."
-        },
-        {
-          "path": "frontend/src/ui/HudOverlay.tsx",
-          "operation": "modify",
-          "description": "Add optional offline HUD display for stats and current weapon (English text) without introducing backend calls; ensure online mode retains sync/player count HUD behavior."
-        },
-        {
-          "path": "frontend/src/pages/OfflineSkirmishView.tsx",
-          "operation": "modify",
-          "description": "Show offline stats in the HUD and add pause-menu instructions for weapon switching (e.g., '1/2 - Switch weapon'); ensure ESC menu supports resume/return-to-menu."
+          "description": "Disable or gate the 'Create New Lobby' button when Internet Identity is not connected (identity is falsy). When unauthenticated, prevent calling the joinLobby mutation and instead show an English prompt (toast) to sign in; optionally add inline helper text near the button. Ensure the enabled/disabled state updates reactively when identity changes (no reload). Use the selected authorization component's frontend guidance for authentication-aware UI states; verify the component's usage instructions before implementing."
         }
       ]
     }

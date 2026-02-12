@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
-import { useGetActiveLobbies, useJoinLobby, useLeaveLobby, useStartGame } from '../hooks/useQueries';
+import { useGetActiveLobbies, useJoinLobby, useLeaveLobby, useStartGame, useGetCallerUserProfile } from '../hooks/useQueries';
 import LoginButton from '../ui/LoginButton';
 import ProfileSetupDialog from '../ui/ProfileSetupDialog';
 import DisclaimerFooter from '../ui/DisclaimerFooter';
 import type { AppView } from '../App';
-import { ArrowLeft, Users, Play, LogOut } from 'lucide-react';
+import { ArrowLeft, Users, Play, LogOut, Lock } from 'lucide-react';
 import { toast } from 'sonner';
+import { extractErrorMessage } from '../utils/errorMessages';
 
 interface LobbyViewProps {
   onNavigate: (view: AppView, lobbyId?: bigint) => void;
@@ -17,24 +18,39 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
   const { identity, clear } = useInternetIdentity();
   const queryClient = useQueryClient();
   const { data: lobbies = [], isLoading } = useGetActiveLobbies();
+  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const joinLobbyMutation = useJoinLobby();
   const leaveLobbyMutation = useLeaveLobby();
   const startGameMutation = useStartGame();
   const [currentLobby, setCurrentLobby] = useState<bigint | null>(null);
 
+  const isAuthenticated = !!identity;
   const myPrincipal = identity?.getPrincipal().toString();
   const myLobby = lobbies.find(l => 
     l.players.some(p => p.toString() === myPrincipal)
   );
 
   const handleCreateLobby = async () => {
+    // Gate behind authentication
+    if (!isAuthenticated) {
+      toast.error('Please sign in to create a lobby');
+      return;
+    }
+
+    // Check if profile is set up
+    if (!profileLoading && isFetched && userProfile === null) {
+      toast.error('Please complete your profile setup first');
+      return;
+    }
+
     try {
       const lobby = await joinLobbyMutation.mutateAsync();
       setCurrentLobby(lobby.id);
       toast.success('Lobby created successfully');
     } catch (error) {
-      toast.error('Failed to create lobby');
-      console.error(error);
+      const userMessage = extractErrorMessage(error);
+      toast.error(userMessage);
+      console.error('Lobby creation error:', error);
     }
   };
 
@@ -45,8 +61,9 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
       setCurrentLobby(null);
       toast.success('Left lobby');
     } catch (error) {
-      toast.error('Failed to leave lobby');
-      console.error(error);
+      const userMessage = extractErrorMessage(error);
+      toast.error(userMessage);
+      console.error('Leave lobby error:', error);
     }
   };
 
@@ -57,8 +74,9 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
       toast.success('Starting game...');
       onNavigate('online-game', myLobby.id);
     } catch (error) {
-      toast.error('Failed to start game');
-      console.error(error);
+      const userMessage = extractErrorMessage(error);
+      toast.error(userMessage);
+      console.error('Start game error:', error);
     }
   };
 
@@ -69,6 +87,7 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
   };
 
   const isOwner = myLobby && myLobby.owner.toString() === myPrincipal;
+  const canCreateLobby = isAuthenticated && !profileLoading && isFetched && userProfile !== null;
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
@@ -172,15 +191,29 @@ export default function LobbyView({ onNavigate }: LobbyViewProps) {
 
           {/* Create Lobby */}
           {!myLobby && (
-            <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-6">
+            <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-6 space-y-3">
               <button
                 onClick={handleCreateLobby}
-                disabled={joinLobbyMutation.isPending}
+                disabled={!canCreateLobby || joinLobbyMutation.isPending}
                 className="w-full py-4 px-6 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-lg font-medium"
               >
-                <Users className="w-6 h-6" />
-                Create New Lobby
+                {!isAuthenticated ? (
+                  <>
+                    <Lock className="w-6 h-6" />
+                    Sign In to Create Lobby
+                  </>
+                ) : (
+                  <>
+                    <Users className="w-6 h-6" />
+                    {joinLobbyMutation.isPending ? 'Creating...' : 'Create New Lobby'}
+                  </>
+                )}
               </button>
+              {!isAuthenticated && (
+                <p className="text-sm text-muted-foreground text-center">
+                  You must be signed in to create or join lobbies
+                </p>
+              )}
             </div>
           )}
 

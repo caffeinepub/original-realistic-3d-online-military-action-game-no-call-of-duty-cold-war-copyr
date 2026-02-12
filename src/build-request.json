@@ -1,80 +1,100 @@
 {
   "kind": "build_request",
-  "title": "Add true offline mode and expand single-player content",
-  "priority": "normal",
+  "title": "Fix lobby creation failure (Create New Lobby shows 'Failed')",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-8",
-      "text": "Implement a true offline mode that is playable without Internet Identity authentication and without any backend/canister calls, ensuring offline gameplay screens do not trigger React Query polling or authenticated backend queries.",
-      "target": "frontend",
+      "id": "REQ-11",
+      "text": "Fix backend authorization so an authenticated Internet Identity user can successfully create a lobby via joinLobby (and does not hit an 'Unauthorized' trap due to missing #user permission). Ensure the anonymous principal is still blocked from creating lobbies.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-3"
         ],
         "quotes": [
-          "add more into the game plz and add offline mode too"
+          "i can't create a new lobby it say failed"
         ]
       },
       "acceptanceCriteria": [
-        "A user can start offline gameplay without signing in via Internet Identity.",
-        "When playing offline, the frontend does not call backend queries/mutations (no polling requests such as getPlayersInGame).",
-        "If the backend is unreachable (e.g., network down), offline mode still loads and remains playable without showing repeated error toasts or blocking UI.",
-        "Online mode behavior remains unchanged (still requires sign-in to access lobby/online match)."
+        "Calling joinLobby as an authenticated principal succeeds and returns a LobbyState.",
+        "Calling joinLobby as the anonymous principal traps with a clear unauthorized error.",
+        "The change does not require a state migration (no migration.mo added unless strictly necessary)."
       ]
     },
     {
-      "id": "REQ-9",
-      "text": "Add a dedicated offline gameplay option (separate from the current Training view) that provides an additional single-player experience (e.g., an 'Offline Skirmish' mode) using the existing FPS controls and weapon handling, with locally simulated opponents/targets and no backend dependency.",
-      "target": "frontend",
+      "id": "REQ-12",
+      "text": "Fix backend authorization so an authenticated Internet Identity user can save a user profile via saveCallerUserProfile without requiring pre-existing #user permissions (avoid a permissions deadlock for first-time users). Anonymous principal must still be blocked.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-3"
         ],
         "quotes": [
-          "add more into the game plz and add offline mode too"
+          "i can't create a new lobby it say failed"
         ]
       },
       "acceptanceCriteria": [
-        "Home menu includes a clearly labeled offline-only option (English text) that does not require sign-in.",
-        "Offline Skirmish runs entirely client-side using the existing Three.js/React Three Fiber pipeline and FPS controls.",
-        "Offline Skirmish shows at least one locally simulated non-player entity (e.g., moving target/dummy) in the scene.",
-        "ESC menu works in Offline Skirmish (resume + return to menu)."
+        "Authenticated users can call saveCallerUserProfile successfully even on first login.",
+        "Anonymous principal cannot call saveCallerUserProfile.",
+        "Existing user profiles continue to load correctly via getCallerUserProfile for authenticated users."
       ]
     },
     {
-      "id": "REQ-10",
-      "text": "Expand the offline/single-player content with additional gameplay elements beyond the current initial slice, including (at minimum) a basic scoring or stats mechanic for hits and at least one additional weapon behavior or weapon option that the player can switch to during offline play.",
+      "id": "REQ-13",
+      "text": "Improve the Lobby UI error handling for lobby creation failures by displaying a more specific, user-readable error message (e.g., include backend error text when available) instead of only the generic toast 'Failed to create lobby'.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-3"
         ],
         "quotes": [
-          "add more into the game plz and add offline mode too"
+          "i can't create a new lobby it say failed"
         ]
       },
       "acceptanceCriteria": [
-        "Offline mode includes a visible, updating score/stats indicator in the HUD (English text), such as hit count, accuracy, or time-based score.",
-        "Player can switch between at least two weapon options/behaviors during offline play (e.g., different fire rate/spread/ammo), with clear input instructions available in the pause menu.",
-        "Offline gameplay content additions do not change or break the existing online multiplayer flow, lobby flow, or synchronization HUD in online mode.",
-        "All added content remains original and does not reference or copy any copyrighted Call of Duty/Cold War assets, names, or UI styling."
+        "When Create New Lobby fails, the toast includes a specific reason when available (e.g., unauthorized/anonymous/other trap message), while still being in English and user-friendly.",
+        "Console logging remains available for debugging, but the user-facing toast is more informative than the current generic message."
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "Prevent unauthenticated users from attempting to create a lobby from the Lobby screen: disable or gate the 'Create New Lobby' action when Internet Identity is not connected, and show an English prompt to sign in.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "i can't create a new lobby it say failed"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If the user is not signed in, clicking Create New Lobby does not call the joinLobby mutation.",
+        "The UI clearly indicates sign-in is required to create a lobby (English text).",
+        "If the user signs in, the Create New Lobby action becomes available without needing a page reload."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor (all logic in backend/main.mo); only add backend changes if strictly required for the offline request.",
-    "Do not edit files under frontend/src/components/ui (compose existing components instead).",
-    "Do not edit immutable hook files: frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
-    "Use English for all user-facing strings.",
-    "No WebSockets or real-time protocols; polling is allowed only for online mode."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Adding third-party authentication providers (only Internet Identity is supported for online mode).",
-    "Adding external databases or non-Motoko backend services.",
-    "Implementing competitive ranked systems, complex AI, or large campaign content."
+    "Adding new multiplayer gameplay features beyond fixing lobby creation and related authorization.",
+    "Implementing real-time networking (WebSockets) or external databases/auth providers."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

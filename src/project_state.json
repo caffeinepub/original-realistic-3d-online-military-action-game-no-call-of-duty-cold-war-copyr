@@ -1,12 +1,14 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
+  "projectStateVersion": 7,
   "summary": "Project to create an original, realistic 3D online multiplayer military action game inspired by modern military shooters, explicitly avoiding any copyrighted Call of Duty content.",
   "architectural_notes": [
     "Must be original and not use copyrighted Call of Duty/Cold War characters, maps, assets, branding, or storyline."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Creating a new lobby fails with an error message ('failed')."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-an-original-non-call-of-duty-realistic-3d-military-action-game-concept-and-implement-the-initial-playable-slice-a-single-small-training-map-first-person-camera-basic-wasd-movement-mouse-look-jump-crouch-sprint-and-simple-weapon-handling-aim-shoot-using-three-js-react-three-fiber",
@@ -79,6 +81,22 @@
         "REQ-10"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-improve-the-lobby-ui-error-handling-for-lobby-creation-failures-by-displaying-a-more-specific-user-readable-error-message-e-g-include-backend-error-text-when-available-instead-of-only-the-generic-toast-failed-to-create-lobby",
+      "title": "Improve the Lobby UI error handling for lobby creation failures by displaying a more specific, user-readable error message (e.g., include backend error text when available) instead of only the generic toast 'Failed to create lobby'.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-prevent-unauthenticated-users-from-attempting-to-create-a-lobby-from-the-lobby-screen-disable-or-gate-the-create-new-lobby-action-when-internet-identity-is-not-connected-and-show-an-english-prompt-to-sign-in",
+      "title": "Prevent unauthenticated users from attempting to create a lobby from the Lobby screen: disable or gate the 'Create New Lobby' action when Internet Identity is not connected, and show an English prompt to sign in.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -112,6 +130,22 @@
       "id": "AR-7",
       "summary": "Expand the game with additional content/features beyond the current initial slice (more gameplay elements, maps, weapons, or modes—TBD).",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Fix backend authorization so an authenticated Internet Identity user can successfully create a lobby via joinLobby (and does not hit an 'Unauthorized' trap due to missing #user permission). Ensure the anonymous principal is still blocked from creating lobbies.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Fix backend authorization so an authenticated Internet Identity user can save a user profile via saveCallerUserProfile without requiring pre-existing #user permissions (avoid a permissions deadlock for first-time users). Anonymous principal must still be blocked.",
+      "reqIds": [
+        "REQ-12"
+      ],
       "status": "pending"
     }
   ],

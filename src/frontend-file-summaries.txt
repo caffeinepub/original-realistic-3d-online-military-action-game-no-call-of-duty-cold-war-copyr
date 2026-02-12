@@ -5,7 +5,7 @@
   "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profiles, player positions, lobbies, and game state with polling intervals for multiplayer sync.",
   "frontend/src/pages/HomeView.tsx": "Home screen with military-themed UI, game logo, background image, three mode selection cards (training, offline skirmish, online), login integration, and profile setup.",
   "frontend/src/pages/TrainingView.tsx": "Training mode view mounting the 3D game canvas with training scene, HUD overlay, and ESC menu for pause/resume/exit functionality.",
-  "frontend/src/pages/LobbyView.tsx": "Multiplayer lobby interface for creating/joining lobbies, viewing player lists, starting games, with authentication and profile integration.",
+  "frontend/src/pages/LobbyView.tsx": "Multiplayer lobby interface with authentication-gated lobby creation, specific error message handling using extractErrorMessage utility, profile setup validation, and reactive UI states that update when identity changes.",
   "frontend/src/pages/OnlineGameView.tsx": "Online multiplayer game view with 3D canvas, online match scene, HUD with sync indicators, and pause menu.",
   "frontend/src/game/GameCanvas.tsx": "React Three Fiber canvas wrapper with optimized renderer settings, shadows, fog, and performance configurations for realistic 3D rendering.",
   "frontend/src/game/scenes/TrainingScene.tsx": "Training map scene with realistic lighting, ground plane, cover structures, target dummies, and local player controls.",
@@ -21,5 +21,6 @@
   "frontend/src/ui/DisclaimerFooter.tsx": "Footer component with legal disclaimer stating no affiliation with Call of Duty/Activision and caffeine.ai attribution with UTM tracking.",
   "frontend/src/pages/OfflineSkirmishView.tsx": "Offline skirmish mode view with 3D canvas, local stats tracking (shots, hits, accuracy, score), weapon switching (1/2 keys), ESC pause menu with controls/stats display, and no backend dependencies.",
   "frontend/src/game/scenes/OfflineSkirmishScene.tsx": "Offline-only React Three Fiber scene with three moving targets using local physics, client-side hit detection with weapon spread, same training map environment, and callbacks for hit/miss tracking.",
-  "frontend/src/game/weapons/offlineWeapons.ts": "Weapon configuration definitions for offline mode with two distinct weapons (Tactical Rifle and Rapid SMG) having different fire rates, spread, and damage values."
+  "frontend/src/game/weapons/offlineWeapons.ts": "Weapon configuration definitions for offline mode with two distinct weapons (Tactical Rifle and Rapid SMG) having different fire rates, spread, and damage values.",
+  "frontend/src/utils/errorMessages.ts": "Utility function to extract user-friendly error messages from various error types while detecting common backend authorization traps and converting them to clear English messages."
 }

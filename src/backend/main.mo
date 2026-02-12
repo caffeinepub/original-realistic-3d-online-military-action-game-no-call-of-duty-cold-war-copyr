@@ -72,31 +72,25 @@ actor {
 
   // User profile functions
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view profiles");
-    };
+    if (caller.isAnonymous()) { Runtime.trap("Unauthorized: Only authenticated users can view profiles") };
     userProfiles.get(caller);
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own profile");
+      Runtime.trap("Unauthorized: Only users/admins can view profiles for others");
     };
     userProfiles.get(user);
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
-    };
+    if (caller.isAnonymous()) { Runtime.trap("Unauthorized: Only authenticated users can save profiles") };
     userProfiles.add(caller, profile);
   };
 
   // Join a lobby
   public shared ({ caller }) func joinLobby() : async LobbyState {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can join lobbies");
-    };
+    if (caller.isAnonymous()) { Runtime.trap("Unauthorized: Only authenticated users can join lobbies") };
 
     let lobbyId = nextLobbyId;
     nextLobbyId += 1;

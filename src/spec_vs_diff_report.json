@@ -1,56 +1,24 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T20:33:35.016Z",
-  "summary": "Offline Skirmish mode, local moving targets, local stats/scoring, and weapon switching were added. However, the diff shows the HUD still instantiates an online React Query hook unconditionally, which risks backend polling/calls during offline play and violates the “no backend calls in offline mode” requirement.",
-  "missing_requirements": [
-    {
-      "id": "REQ-8",
-      "requirement": "When playing offline, the frontend does not call backend queries/mutations (no polling requests such as getPlayersInGame), and offline screens do not trigger React Query polling or authenticated backend queries.",
-      "reason": "HudOverlay creates the online query hook unconditionally (`const playersQuery = useGetPlayersInGame();`). Even if the returned data is only used in online mode, the hook itself may still execute and poll, causing backend/canister calls during offline gameplay.",
-      "evidence": [
-        "frontend/src/ui/HudOverlay.tsx"
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "requirement": "If the backend is unreachable (e.g., network down), offline mode still loads and remains playable without showing repeated error toasts or blocking UI.",
-      "reason": "The diff shows new offline view/scene and a global Toaster, but does not show any handling to suppress/avoid repeated backend error toasts when offline mode is used (especially since an online query hook is still instantiated in the HUD).",
-      "evidence": [
-        "frontend/src/ui/HudOverlay.tsx",
-        "frontend/src/App.tsx"
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "requirement": "Player can switch between at least two weapon options/behaviors during offline play, with clear input instructions available in the pause menu.",
-      "reason": "Weapon switching is implemented via keys 1/2 and the HUD shows '1/2 - Switch Weapon', but the pause menu control/instruction section is truncated in the diff; it is not fully evidenced that the pause menu itself includes the weapon-switch instructions.",
-      "evidence": [
-        "frontend/src/pages/OfflineSkirmishView.tsx (truncated)",
-        "frontend/src/ui/HudOverlay.tsx"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-12T20:56:47.801Z",
+  "summary": "Diff implements backend authorization changes to allow authenticated principals (non-anonymous) to create lobbies via joinLobby and save profiles via saveCallerUserProfile, while trapping anonymous callers with clearer Unauthorized messages. Frontend LobbyView now gates Create New Lobby behind authentication and improves error toasts by extracting more specific messages from backend errors via a new utility.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Global UI theme overhaul (military-inspired OKLCH palette, Tailwind design tokens/shadows) beyond the offline-mode and single-player-content request.",
-      "reason": "BuildRequest focuses on offline mode and offline gameplay content; it does not request a redesign/theme-token update. The diff summary indicates changes to global styles and Tailwind configuration.",
+      "description": "Frontend now blocks lobby creation if the caller’s profile is not set up (requires completing profile setup first).",
+      "reason": "REQ-14 only requires gating lobby creation on Internet Identity authentication, not on presence of a user profile; this adds an additional prerequisite for creating a lobby.",
       "evidence": [
-        "frontend-file-summaries.txt (entries for frontend/src/index.css and frontend/tailwind.config.js)"
+        "frontend/src/pages/LobbyView.tsx"
       ]
     }
   ],
-  "confidence": 0.68,
+  "confidence": 0.74,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/game/components/PlayerArmsAndWeapon.tsx",
-    "frontend/src/game/scenes/OfflineSkirmishScene.tsx",
-    "frontend/src/game/weapons/offlineWeapons.ts",
-    "frontend/src/game/weapons/useWeapon.ts",
-    "frontend/src/pages/HomeView.tsx",
-    "frontend/src/pages/OfflineSkirmishView.tsx",
-    "frontend/src/ui/HudOverlay.tsx",
+    "frontend/src/pages/LobbyView.tsx",
+    "frontend/src/utils/errorMessages.ts",
     "project_state.json"
   ]
 }
