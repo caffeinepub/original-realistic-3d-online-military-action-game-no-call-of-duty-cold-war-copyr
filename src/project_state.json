@@ -1,16 +1,17 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
+  "projectStateVersion": 21,
   "summary": "Project to create an original, realistic 3D online multiplayer military action game inspired by modern military shooters, explicitly avoiding any copyrighted Call of Duty content.",
   "architectural_notes": [
     "Must be original and not use copyrighted Call of Duty/Cold War characters, maps, assets, branding, or storyline.",
-    "Any new maps must be original and must not recreate or closely imitate recognizable Call of Duty map layouts, landmarks, names, or signature set pieces."
+    "Any new maps must be original and must not recreate or closely imitate recognizable Call of Duty map layouts, landmarks, names, or signature set pieces.",
+    "Plan for a distributable HTML5 build output (static files with index.html) that can be zipped and uploaded to itch.io."
   ],
   "known_issues": [
     "Creating a new lobby fails with an error message ('failed').",
     "Game performance is slow (low FPS / laggy runtime)."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-an-original-non-call-of-duty-realistic-3d-military-action-game-concept-and-implement-the-initial-playable-slice-a-single-small-training-map-first-person-camera-basic-wasd-movement-mouse-look-jump-crouch-sprint-and-simple-weapon-handling-aim-shoot-using-three-js-react-three-fiber",
@@ -203,6 +204,38 @@
         "REQ-30"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-reliable-production-build-workflow-that-generates-an-itch-io-ready-html5-build-folder-containing-an-index-html-and-all-required-static-assets-including-assets-generated-so-the-user-can-zip-the-output-folder-and-upload-it-to-itch-io",
+      "title": "Add a reliable production build workflow that generates an itch.io-ready HTML5 build folder containing an index.html and all required static assets (including /assets/generated/*) so the user can zip the output folder and upload it to itch.io.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-clear-english-documentation-in-repo-describing-exactly-how-to-generate-the-itch-io-build-folder-and-zip-it-for-upload-including-how-to-verify-the-output-locally-before-uploading",
+      "title": "Add clear, English documentation in-repo describing exactly how to generate the itch.io build folder and zip it for upload, including how to verify the output locally before uploading.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-allow-changing-the-production-build-output-folder-name-currently-dist-by-making-vite-s-build-outdir-configurable-while-keeping-dist-as-the-default-when-no-override-is-provided",
+      "title": "Allow changing the production build output folder name (currently \"dist\") by making Vite's build.outDir configurable, while keeping \"dist\" as the default when no override is provided.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-itch-io-build-documentation-to-reflect-that-the-build-folder-name-may-be-configured-and-clearly-state-how-to-identify-which-folder-to-zip-for-upload-using-english-user-facing-text",
+      "title": "Update the itch.io build documentation to reflect that the build folder name may be configured, and clearly state how to identify which folder to zip for upload (using English user-facing text).",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -294,6 +327,12 @@
       "reqIds": [
         "REQ-29"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add a release/build packaging workflow to generate a deployable HTML5 build folder (index.html + assets) suitable for uploading to itch.io (zip-ready).",
+      "reqIds": [],
       "status": "pending"
     }
   ],

@@ -1,52 +1,46 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T22:44:10.891Z",
+  "generatedAt": "2026-02-12T23:16:38.948Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 1,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-28",
-        "summary": "Fix backend authorization so an authenticated Internet Identity user can successfully create a new lobby via the joinLobby method, while the anonymous principal remains blocked.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-29",
-        "summary": "Remove or revise backend permission checks that currently rely on #user permissions in a way that can deadlock normal gameplay (e.g., leaveLobby, updatePlayerPosition, getPlayersInGame, startGame, endGame), so that authenticated users can perform expected multiplayer actions without needing manual permission assignment, while anonymous callers remain blocked.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-30",
-        "summary": "Ensure the Lobby UI surfaces the real backend error reason when lobby creation fails (instead of a generic message like \"failed\"), using English user-facing text.",
+        "id": "REQ-33",
+        "summary": "Allow changing the production build output folder name (currently \"dist\") by making Vite's build.outDir configurable, while keeping \"dist\" as the default when no override is provided.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/errorMessages.ts",
-          "frontend/src/pages/LobbyView.tsx"
+          "frontend/vite.config.ts"
         ],
         "matchedFiles": [
-          "frontend/src/utils/errorMessages.ts",
-          "frontend/src/pages/LobbyView.tsx"
+          "frontend/vite.config.ts"
+        ]
+      },
+      {
+        "id": "REQ-34",
+        "summary": "Update the itch.io build documentation to reflect that the build folder name may be configured, and clearly state how to identify which folder to zip for upload (using English user-facing text).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/ITCHIO_BUILD.md"
+        ],
+        "matchedFiles": [
+          "frontend/ITCHIO_BUILD.md"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/LobbyView.tsx",
-    "frontend/src/utils/errorMessages.ts",
+    "frontend/ITCHIO_BUILD.md",
+    "frontend/vite.config.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

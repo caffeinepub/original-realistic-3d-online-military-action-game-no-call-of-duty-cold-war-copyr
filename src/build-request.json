@@ -1,75 +1,53 @@
 {
   "kind": "build_request",
-  "title": "Fix Multiplayer Lobby Creation Failure for Authenticated Users",
-  "priority": "high",
+  "title": "Make the Vite build output folder name configurable (change default dist)",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-28",
-      "text": "Fix backend authorization so an authenticated Internet Identity user can successfully create a new lobby via the joinLobby method, while the anonymous principal remains blocked.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "recent-messages-4",
-          "recent-messages-7"
-        ],
-        "quotes": [
-          "MULTIPLAYER LOBBY not let me create new lobby",
-          "try again"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When signed in with Internet Identity, calling joinLobby returns a LobbyState and persists the lobby so it appears in getActiveLobbies.",
-        "When not signed in (anonymous caller), calling joinLobby traps with an Unauthorized error.",
-        "Creating a lobby does not require any pre-existing permissions that a first-time user would not have."
-      ]
-    },
-    {
-      "id": "REQ-29",
-      "text": "Remove or revise backend permission checks that currently rely on #user permissions in a way that can deadlock normal gameplay (e.g., leaveLobby, updatePlayerPosition, getPlayersInGame, startGame, endGame), so that authenticated users can perform expected multiplayer actions without needing manual permission assignment, while anonymous callers remain blocked.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "recent-messages-4"
-        ],
-        "quotes": [
-          "MULTIPLAYER LOBBY not let me create new lobby"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Authenticated users can leave a lobby they are in using leaveLobby without hitting an Unauthorized error caused solely by missing #user permission.",
-        "Authenticated users can updatePlayerPosition and fetch getPlayersInGame without hitting an Unauthorized error caused solely by missing #user permission.",
-        "Authenticated lobby host can startGame without hitting an Unauthorized error caused solely by missing #user permission.",
-        "Anonymous callers are still rejected (Unauthorized) for multiplayer state-changing actions."
-      ]
-    },
-    {
-      "id": "REQ-30",
-      "text": "Ensure the Lobby UI surfaces the real backend error reason when lobby creation fails (instead of a generic message like \"failed\"), using English user-facing text.",
+      "id": "REQ-33",
+      "text": "Allow changing the production build output folder name (currently \"dist\") by making Vite's build.outDir configurable, while keeping \"dist\" as the default when no override is provided.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages-4"
+          "recent-messages"
         ],
         "quotes": [
-          "MULTIPLAYER LOBBY not let me create new lobby"
+          "can i change my build folder name"
         ]
       },
       "acceptanceCriteria": [
-        "If lobby creation fails due to backend trap/Unauthorized/not found, the toast shows a specific, English message that reflects the underlying reason (not only \"failed\" or \"An unexpected error occurred\").",
-        "Console logging still includes the raw error object for debugging.",
-        "The existing authentication gating behavior remains intact (unauthenticated users cannot attempt to create a lobby)."
+        "By default, running the production build still outputs to a folder named \"dist\".",
+        "There is a documented, supported way to override the output folder name (e.g., via an environment variable) without editing source files each time.",
+        "The configured output folder is used consistently for the Vite build output."
+      ]
+    },
+    {
+      "id": "REQ-34",
+      "text": "Update the itch.io build documentation to reflect that the build folder name may be configured, and clearly state how to identify which folder to zip for upload (using English user-facing text).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "User: dist",
+          "User: can i change my build folder name"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Documentation explains the default build folder name is \"dist\".",
+        "Documentation explains how to change the build folder name (matching the implementation in REQ-33).",
+        "Documentation instructs users to zip the configured build output folder (the one containing index.html) for itch.io upload."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Use English for all user-facing text."
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or anything in frontend/src/components/ui (compose instead).",
+    "Keep the existing relative base path behavior (base: \"./\") so the output remains itch.io compatible."
   ],
   "nonGoals": [
-    "Adding new multiplayer features (chat, voice, matchmaking, or WebSockets).",
-    "Changing map content, weapons, or graphics/performance settings.",
-    "Introducing any external database or third-party auth besides Internet Identity."
+    "Changing the app’s runtime routing/base URL behavior beyond what is required for a renamed output folder.",
+    "Adding new deployment targets or external hosting integrations."
   ],
   "imageRequirements": {
     "required": [],

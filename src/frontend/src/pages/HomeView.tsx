@@ -6,6 +6,7 @@ import type { AppView } from '../App';
 import { Target, Users, Swords, Settings } from 'lucide-react';
 import { useGraphicsSettings } from '../game/settings/useGraphicsSettings';
 import type { GraphicsMode } from '../game/settings/graphics';
+import { getAssetUrl } from '../utils/assetPaths';
 
 interface HomeViewProps {
   onNavigate: (view: AppView) => void;
@@ -22,7 +23,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ 
-          backgroundImage: 'url(/assets/generated/menu-background.dim_1920x1080.png)',
+          backgroundImage: `url(${getAssetUrl('assets/generated/menu-background.dim_1920x1080.png')})`,
           filter: 'brightness(0.4)'
         }}
       />
@@ -32,7 +33,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
       <header className="relative z-10 flex justify-between items-center p-6">
         <div className="flex items-center gap-4">
           <img 
-            src="/assets/generated/game-logo.dim_512x512.png" 
+            src={getAssetUrl('assets/generated/game-logo.dim_512x512.png')}
             alt="Game Logo" 
             className="w-16 h-16 object-contain"
           />

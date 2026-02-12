@@ -1,26 +1,37 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Surface Real Backend Errors in Multiplayer Lobby Creation UI",
+  "title": "Configurable Vite production build output folder (default: dist) + updated itch.io docs",
   "requirements": [
     {
-      "id": "REQ-30",
-      "summary": "Show specific, English lobby-creation failure reasons from backend traps/rejections (instead of generic failure), while keeping raw error logging and existing auth gating.",
+      "id": "REQ-33",
+      "summary": "Make Vite build.outDir configurable (defaulting to \"dist\") while preserving base: \"./\" for itch.io compatibility.",
       "acceptanceCriteria": [
-        "If lobby creation fails due to backend trap/Unauthorized/not found, the toast shows a specific, English message that reflects the underlying reason (not only \"failed\" or \"An unexpected error occurred\").",
-        "Console logging still includes the raw error object for debugging.",
-        "The existing authentication gating behavior remains intact (unauthenticated users cannot attempt to create a lobby)."
+        "By default, running the production build still outputs to a folder named \"dist\".",
+        "There is a documented, supported way to override the output folder name (e.g., via an environment variable) without editing source files each time.",
+        "The configured output folder is used consistently for the Vite build output."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/errorMessages.ts",
+          "path": "frontend/vite.config.ts",
           "operation": "modify",
-          "description": "Improve error extraction to reliably surface the underlying backend rejection/trap reason (e.g., Unauthorized vs not found vs transient/network), including handling common agent error shapes (message/reject_message/error_code) and returning clear English user-facing text. Align behavior with the selected \"authorization\" component’s guidance on handling authorization errors from backend trap calls. Verify the component's usage instructions before implementing."
-        },
+          "description": "Update Vite config to derive build.outDir from a supported override (e.g., a Node environment variable such as BUILD_OUT_DIR), falling back to \"dist\" when not provided. Keep base set to \"./\" unchanged to preserve existing relative base path behavior and itch.io compatibility."
+        }
+      ]
+    },
+    {
+      "id": "REQ-34",
+      "summary": "Update itch.io build documentation to explain the default and configurable build output folder, and which folder to zip for upload.",
+      "acceptanceCriteria": [
+        "Documentation explains the default build folder name is \"dist\".",
+        "Documentation explains how to change the build folder name (matching the implementation in REQ-33).",
+        "Documentation instructs users to zip the configured build output folder (the one containing index.html) for itch.io upload."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/pages/LobbyView.tsx",
+          "path": "frontend/ITCHIO_BUILD.md",
           "operation": "modify",
-          "description": "Update lobby creation failure handling to present a specific, contextual toast message derived from the enhanced extractErrorMessage (e.g., prefix with \"Could not create lobby:\" when appropriate), while keeping console.error logging of the raw error object and preserving the existing authentication/profile gating that prevents unauthenticated users from attempting lobby creation. Verify the component's usage instructions before implementing."
+          "description": "Expand the itch.io build guide with clear English instructions: confirm default output folder is \"dist\"; document how to override the build output folder name (matching the environment-variable-based approach implemented in frontend/vite.config.ts); and instruct users to zip the configured output folder (the one that contains index.html) for upload to itch.io."
         }
       ]
     }

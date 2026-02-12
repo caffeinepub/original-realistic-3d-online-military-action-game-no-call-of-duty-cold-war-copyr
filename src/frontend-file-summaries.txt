@@ -3,7 +3,7 @@
   "frontend/tailwind.config.js": "Extended Tailwind configuration with Inter font family, tactical color scheme, custom shadows, and military-themed design tokens.",
   "frontend/src/App.tsx": "Main app component wrapped with GraphicsSettingsProvider and DebugSettingsProvider for global performance settings.",
   "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profiles, player positions, lobbies, game state management, map selection mutation, and optimized cache updates using setQueryData.",
-  "frontend/src/pages/HomeView.tsx": "Home screen with graphics mode selector in header for global settings access.",
+  "frontend/src/pages/HomeView.tsx": "Home screen with graphics mode selector in header, using getAssetUrl helper for all static asset references to ensure itch.io subpath compatibility.",
   "frontend/src/pages/TrainingView.tsx": "Training view with pause menu containing graphics mode selector and performance overlay toggle.",
   "frontend/src/pages/LobbyView.tsx": "Multiplayer lobby interface with authentication-gated lobby creation, improved error handling that shows specific contextual error messages (prefixed with action context like \"Could not create lobby:\"), host-only map selection UI, reactive lobby state updates, and profile setup validation.",
   "frontend/src/pages/OnlineGameView.tsx": "Online game view with pause menu containing graphics mode selector, performance overlay toggle, and lobby ID prop passed to OnlineMatchScene for map resolution.",
@@ -37,5 +37,8 @@
   "frontend/src/game/maps/JungleCompoundMap.tsx": "Jungle compound map with muddy terrain, dense ground vegetation, existing trees with performance-aware additional trees, wooden huts with doors, platforms, and distributed cover elements.",
   "frontend/src/game/maps/props/GroundDetailGrass.tsx": "Reusable ground vegetation detail component that renders scattered grass tufts with density and complexity scaled by GraphicsMode (Performance vs Balanced).",
   "frontend/src/game/maps/props/LowPolyTree.tsx": "Low-poly tree prop component supporting normal, desert, and shrub variants with performance-friendly geometry and shadow control.",
-  "frontend/src/game/maps/props/Door.tsx": "Visual-only door component with metal, wood, and reinforced style variants for building structures."
+  "frontend/src/game/maps/props/Door.tsx": "Visual-only door component with metal, wood, and reinforced style variants for building structures.",
+  "frontend/vite.config.ts": "Vite configuration with relative base path for itch.io compatibility, React plugin, path aliases, and production build settings that output to a configurable folder (via BUILD_OUT_DIR environment variable, defaulting to 'dist').",
+  "frontend/src/utils/assetPaths.ts": "Helper function to generate asset URLs with relative paths in production builds, ensuring assets load correctly when hosted from a subpath on itch.io.",
+  "frontend/ITCHIO_BUILD.md": "Complete English documentation for building, verifying, zipping, and uploading the game to itch.io, including instructions for customizing the build output folder name via BUILD_OUT_DIR environment variable, checklist, local testing steps, and troubleshooting guide."
 }

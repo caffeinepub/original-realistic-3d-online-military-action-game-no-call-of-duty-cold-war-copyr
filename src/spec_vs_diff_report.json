@@ -1,33 +1,39 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T22:44:10.887Z",
-  "summary": "Backend joinLobby/leaveLobby now block anonymous callers via explicit caller.isAnonymous() traps and appear to remove prior permission-based deadlocks for leaveLobby. Frontend LobbyView now shows contextual, extracted backend error messages and logs raw errors. However, the diff does not provide evidence that all other multiplayer methods cited in REQ-29 (updatePlayerPosition, getPlayersInGame, startGame, endGame) had their permission checks revised, and the frontend adds a new profile-setup prerequisite for creating a lobby that was not requested and may conflict with the intent that first-time authenticated users can create a lobby without extra prerequisites.",
+  "generatedAt": "2026-02-12T23:16:38.945Z",
+  "summary": "REQ-33 appears implemented by making Vite’s build output directory configurable via an environment variable while keeping the default as `dist`, and preserving `base: './'`. REQ-34 is partially implemented: the itch.io build doc mentions the default folder and an override mechanism, but the provided diff excerpt does not show the required instruction to zip the configured output folder (the one containing `index.html`). Additionally, the diff includes unrelated documentation/state-summary changes not requested by the BuildRequest.",
   "missing_requirements": [
     {
-      "id": "REQ-29",
-      "requirement": "Remove/revise backend permission checks that rely on #user permissions for normal gameplay actions (e.g., updatePlayerPosition, getPlayersInGame, startGame, endGame) so authenticated users can perform expected actions without manual permission assignment, while anonymous callers remain blocked.",
-      "reason": "Only joinLobby and part of leaveLobby are visible in the truncated backend diff; there is no diff evidence showing updates to updatePlayerPosition, getPlayersInGame, startGame, or endGame authorization logic.",
+      "id": "REQ-34",
+      "requirement": "Documentation instructs users to zip the configured build output folder (the one containing index.html) for itch.io upload.",
+      "reason": "The shown portion of `frontend/ITCHIO_BUILD.md` includes default `dist` and mentions `BUILD_OUT_DIR`, but the excerpt is truncated right after the macOS/Linux section header and does not show any explicit instruction about zipping the configured output folder or identifying it by `index.html`.",
       "evidence": [
-        "backend/main.mo (truncated)"
+        "frontend/ITCHIO_BUILD.md"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Frontend requires a completed user profile setup before allowing lobby creation (blocks authenticated users with null profile).",
-      "reason": "REQ-30 asks to surface real backend error reasons on lobby creation failure while preserving existing authentication gating; it does not request adding a new profile prerequisite for creating lobbies, and this could prevent first-time authenticated users from creating a lobby.",
+      "description": "Updates to a large set of frontend feature summaries unrelated to configuring Vite build output (graphics settings providers, gameplay/UI changes, Tailwind theme changes, etc.).",
+      "reason": "BuildRequest is narrowly scoped to Vite `build.outDir` configurability and updating itch.io build documentation. The diff shows changes to `frontend-file-summaries.txt` describing many unrelated frontend features.",
       "evidence": [
-        "frontend/src/pages/LobbyView.tsx"
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Project state/version/feature summary updates unrelated to configuring the Vite output directory or itch.io build instructions.",
+      "reason": "The BuildRequest does not ask to update `project_state.json`; the diff shows it modified with broader project summary/feature metadata.",
+      "evidence": [
+        "project_state.json"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.7,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/pages/LobbyView.tsx",
-    "frontend/src/utils/errorMessages.ts",
+    "frontend/ITCHIO_BUILD.md",
+    "frontend/vite.config.ts",
     "project_state.json"
   ]
 }
